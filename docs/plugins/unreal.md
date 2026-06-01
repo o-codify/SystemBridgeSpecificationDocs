@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.601.1847
+version: 26.601.2301
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -52,7 +52,8 @@ Tools that need C++ reach (`UEdGraphPin::DefaultObject`, `TObjectIterator`,
 | Tool | Purpose |
 |---|---|
 | [`editor_status`](../unreal/index.md#editor_status) | Is the editor alive, reachable, loaded with cwd's project? Includes `last_crash`, `auto_recover` block. Always call this first in multi-step flows. |
-| `editor_restart` | Save → quit → wait → relaunch. Auto-suppresses [crash watcher](../unreal/crash-recovery.md). |
+| `editor_restart` | Save → quit → wait → relaunch. Auto-suppresses [crash watcher](../unreal/crash-recovery.md). Optional `skip_save_all_dirty` quits without persisting (use when the in-memory state is known bad). |
+| `editor_launch` | Cold-start a closed editor: resolve engine binary from EngineAssociation, spawn detached with optional level + extra_args, poll until alive. Idempotent. The cold-start counterpart to `editor_restart`. |
 | `editor_save_all_dirty` | Saves all dirty `/Game` assets. |
 | `editor_load_level` | Open a different level by package path. |
 | `editor_take_screenshot` | HighResShot via the viewport; returns a PNG path. |
@@ -85,6 +86,9 @@ Tools that need C++ reach (`UEdGraphPin::DefaultObject`, `TObjectIterator`,
 | `asset_duplicate` | Duplicate to a new path. Idempotent. |
 | `asset_delete` | Delete; refuses by default if referenced. |
 | `read_uasset` | Parse the `FPackageFileSummary` header — engine version, class names, etc. — without loading the asset. |
+| `dt_row_add` | **v1.5+** Add a row to a UDataTable. Optional `from_row` clones an existing row byte-for-byte (preserves parens-named UDS fields the stock fill APIs corrupt). |
+| `dt_row_set_field` | **v1.5+** Set a single (possibly nested) field on a DataTable row. Dotted path; FProperty::ImportText on the leaf — NOT struct-text. Works with names containing `()`. |
+| `package_discard_changes` | **v1.5+** Drop pending in-memory changes on a package — reload from disk. Headless equivalent of Content Browser's Revert. |
 
 ### Levels + actors
 
