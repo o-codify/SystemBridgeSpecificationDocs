@@ -2,7 +2,7 @@
 id: blueprint-authoring-headless
 title: Blueprint Authoring (headless)
 status: stable
-version: 26.601.1817
+version: 26.601.1830
 tags: [ unreal, blueprint, authoring ]
 ---
 
@@ -312,6 +312,130 @@ bp_node_remove(bp_path, graph_name, node_guid)            # severs links first
 bp_node_reconstruct(bp_path, graph_name, node_guid)       # re-runs AllocateDefaultPins
                                                           # after a property mutation
 ```
+
+## Replication
+
+**v1.4.0+**. Networked features (RPC events, replicated state,
+RepNotify) were impossible to author headless before v1.4 — UE 5.7's
+stock Python can't touch `K2Node_CustomEvent::FunctionFlags` or
+`FBPVariableDescription::PropertyFlags`. Three new tools:
+
+### RPC custom events — `bp_custom_event_configure`
+
+Configure replication on a `K2Node_CustomEvent`. Mirrors the editor's
+right-click "Replicates" dropdown:
+
+```
+# 1. Create the event (existing v1.0 tool).
+bp_custom_event_add(bp_path, graph_name="EventGraph",
+                    custom_event_name="Multicast_PlayLandMontage")
+  → {node_guid, pins: [...]}
+
+# 2. Mark it NetMulticast Reliable.
+bp_custom_event_configure(bp_path, graph_name="EventGraph",
+                          node_guid="<new>",
+                          net_mode="multicast", reliable=True)
+  → {success: true, net_mode: "multicast", reliable: true}
+```
+
+`net_mode`:
+
+| Tag | Flags set on `FunctionFlags` |
+|---|---|
+| `multicast` | `FUNC_Net \| FUNC_NetMulticast` |
+| `server` | `FUNC_Net \| FUNC_NetServer` (clients call, server runs) |
+| `client` | `FUNC_Net \| FUNC_NetClient` (server calls, owning client runs) |
+| `notreplicated` | clears all net flags (local-only event) |
+
+`reliable=true` adds `FUNC_NetReliable`. `call_in_editor=true` flips
+the node's `bCallInEditor` UPROPERTY (the "Call In Editor" checkbox
+in the node detail panel).
+
+Validation note: Server/Client RPCs require a replicated owning
+actor; Multicast must be invoked from the server. Companion just
+sets the flags — graph correctness is the author's responsibility.
+
+### Typed event parameters — `bp_event_add_param`
+
+Custom events default to zero parameters. Add typed output pins:
+
+```
+bp_event_add_param(bp_path, graph_name, node_guid="<custom-event>",
+                   param_name="Montage",
+                   pin_category="object",
+                   sub_category_object="/Script/Engine.AnimMontage")
+  → {success: true, param_name: "Montage"}
+```
+
+The new parameter shows as an OUTPUT pin on the event node so wired
+graphs receive its value (the call-site provides it as an INPUT).
+
+`pin_category` / `sub_category_object` / `container` use the same
+taxonomy as [`bp_variable_add_typed`](#object--class--struct--enum--containers--bp_variable_add_typed).
+
+Works on any `UK2Node_EditablePinBase` — function entries are also
+fair game.
+
+### Replicated / RepNotify variables — `bp_variable_set_replication`
+
+Flip a member variable to replicated or RepNotify mode:
+
+```
+# Plain replicated — server pushes to clients.
+bp_variable_set_replication(bp_path, variable_name="Health",
+                            mode="replicated")
+
+# RepNotify — server change fires OnRep on every client.
+bp_variable_set_replication(bp_path, variable_name="MovementAction",
+                            mode="repnotify",
+                            rep_notify_function="OnRep_MovementAction")
+  → auto-creates the OnRep_MovementAction function graph if absent.
+
+# Clear replication.
+bp_variable_set_replication(bp_path, variable_name="Health",
+                            mode="none")
+```
+
+Behind the scenes Companion sets `CPF_Net` (or `CPF_Net | CPF_RepNotify`)
+on the variable's `FBPVariableDescription.PropertyFlags`, sets
+`RepNotifyFunc`, and for `repnotify` mode creates an empty
+`OnRep_<var>` function graph if the BP doesn't already have one
+(UE recognizes a function with the same name as `RepNotifyFunc`
+as the OnRep handler — empty body is fine).
+
+`rep_notify_function` defaults to `OnRep_<variable_name>` when
+empty.
+
+### End-to-end multiplayer recipe
+
+For the height-based hard landing montage that needed to replicate
+to other players:
+
+```
+# 1. Add a NetMulticast Reliable event with a Montage parameter.
+bp_custom_event_add(bp_path, "EventGraph", "Multicast_PlayLandMontage")
+bp_custom_event_configure(bp_path, "EventGraph", node_guid="<event>",
+                          net_mode="multicast", reliable=True)
+bp_event_add_param(bp_path, "EventGraph", node_guid="<event>",
+                   param_name="Montage",
+                   pin_category="object",
+                   sub_category_object="/Script/Engine.AnimMontage")
+
+# 2. Wire the event's Montage output into Play Anim Montage.
+bp_node_create(..., node_class_path="/Script/BlueprintGraph.K2Node_CallFunction",
+               x=400, y=80)
+bp_node_call_function_target(..., function_owner_class_path="/Script/Engine.KismetSystemLibrary",
+                             function_name="PlayAnimMontage")
+bp_node_link_pins(..., src_pin_name="then",    dst_pin_name="execute")
+bp_node_link_pins(..., src_pin_name="Montage", dst_pin_name="Anim Montage")
+
+# 3. On Landed (server-only path) calls the multicast.
+#    Add a K2Node_CallFunction targeting Multicast_PlayLandMontage,
+#    with the desired montage object set on its input.
+```
+
+After compile + 2-player PIE, both the listen-server and the
+simulated proxy play the hard-landing montage synchronously.
 
 ## Compile + save
 
