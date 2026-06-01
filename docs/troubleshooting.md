@@ -1,8 +1,8 @@
 ---
 id: troubleshooting
 title: Troubleshooting
-status: draft
-version: 26.601.1508
+status: review
+version: 26.601.1521
 tags:
   - troubleshooting
 ---
