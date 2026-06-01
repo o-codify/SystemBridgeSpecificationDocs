@@ -2,7 +2,7 @@
 id: pie-workflow
 title: PIE Workflow
 status: stable
-version: 26.601.1605
+version: 26.601.1817
 tags: [ unreal, pie, playtest ]
 ---
 

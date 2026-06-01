@@ -2,7 +2,7 @@
 id: systembridge-overview
 title: SystemBridge — Overview
 status: stable
-version: 26.601.1605
+version: 26.601.1817
 tags: [ overview, index ]
 ---
 

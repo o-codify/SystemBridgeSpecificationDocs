@@ -2,7 +2,7 @@
 id: workflow-pie-debugging
 title: "Workflow: PIE Debugging"
 status: stable
-version: 26.601.1605
+version: 26.601.1817
 tags: [ workflow, pie ]
 ---
 
