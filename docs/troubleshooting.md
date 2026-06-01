@@ -1,10 +1,9 @@
 ---
 id: troubleshooting
 title: Troubleshooting
-status: draft
-version: 26.601.1517
-tags:
-  - troubleshooting
+status: stable
+version: 26.601.1605
+tags: [ troubleshooting ]
 ---
 
 # Troubleshooting

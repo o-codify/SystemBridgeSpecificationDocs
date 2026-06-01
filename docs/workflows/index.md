@@ -1,11 +1,9 @@
 ---
 id: workflows-index
 title: Workflows — Index
-status: draft
-version: 26.601.1517
-tags:
-  - workflows
-  - index
+status: stable
+version: 26.601.1605
+tags: [ workflows, index ]
 ---
 
 # Workflows — Index

@@ -1,10 +1,9 @@
 ---
 id: changelog
 title: Changelog
-status: draft
-version: 26.601.1517
-tags:
-  - changelog
+status: stable
+version: 26.601.1605
+tags: [ changelog ]
 ---
 
 # Changelog

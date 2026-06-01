@@ -1,12 +1,9 @@
 ---
 id: workflow-c-iteration
 title: "Workflow: C++ Iteration"
-status: draft
-version: 26.601.1517
-tags:
-  - workflow
-  - cpp
-  - live-coding
+status: stable
+version: 26.601.1605
+tags: [ workflow, cpp, live-coding ]
 ---
 
 # Workflow: C++ Iteration

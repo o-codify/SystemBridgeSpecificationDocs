@@ -1,12 +1,9 @@
 ---
 id: message-log
 title: Message Log
-status: draft
-version: 26.601.1517
-tags:
-  - unreal
-  - messagelog
-  - diagnostics
+status: stable
+version: 26.601.1605
+tags: [ unreal, messagelog, diagnostics ]
 ---
 
 # Message Log
