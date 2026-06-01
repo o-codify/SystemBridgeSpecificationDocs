@@ -1,8 +1,8 @@
 ---
 id: architecture
 title: Architecture
-status: draft
-version: 26.601.1456
+status: review
+version: 26.601.1520
 tags:
   - architecture
   - internals
