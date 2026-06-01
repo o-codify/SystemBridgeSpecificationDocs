@@ -1,11 +1,9 @@
 ---
 id: installation
 title: Installation
-status: draft
-version: 26.601.1517
-tags:
-  - installation
-  - setup
+status: stable
+version: 26.601.1817
+tags: [ installation, setup ]
 ---
 
 # Installation

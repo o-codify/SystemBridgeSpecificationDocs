@@ -1,11 +1,9 @@
 ---
 id: plugin-files
 title: "Plugin: files"
-status: draft
-version: 26.601.1517
-tags:
-  - plugin
-  - files
+status: stable
+version: 26.601.1817
+tags: [ plugin, files ]
 ---
 
 # Plugin: `files`

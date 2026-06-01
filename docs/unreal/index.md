@@ -1,12 +1,9 @@
 ---
 id: unreal-deep-dive
 title: Unreal — Deep Dive
-status: draft
-version: 26.601.1517
-tags:
-  - unreal
-  - ue
-  - index
+status: stable
+version: 26.601.1847
+tags: [ unreal, ue, index ]
 ---
 
 # Unreal — Deep Dive
@@ -92,8 +89,8 @@ Returns:
 
   // companion drift signal
   "companion_loaded": true,
-  "companion_version": "1.3.4",
-  "expected_companion_version": "1.3.4",
+  "companion_version": "1.4.0",
+  "expected_companion_version": "1.4.0",
   "companion_version_mismatch": false,   // true → run companion_rebuild
 
   // cwd consistency
@@ -138,7 +135,7 @@ Use it BEFORE any multi-step UE workflow:
 Companion v1.3.1+ adds a pill to the LevelEditor status bar:
 
 ```
-[● green] SB v1.3.4
+[● green] SB v1.4.0
 ```
 
 Hover for tooltip listing the bindings that are armed. Useful confirmation

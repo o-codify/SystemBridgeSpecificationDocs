@@ -1,11 +1,9 @@
 ---
 id: workflow-blueprint-feature-add
 title: "Workflow: Blueprint Feature Add"
-status: draft
-version: 26.601.1517
-tags:
-  - workflow
-  - blueprint
+status: stable
+version: 26.601.1817
+tags: [ workflow, blueprint ]
 ---
 
 # Workflow: Blueprint Feature Add

@@ -1,12 +1,9 @@
 ---
 id: workflow-c-iteration
 title: "Workflow: C++ Iteration"
-status: draft
-version: 26.601.1517
-tags:
-  - workflow
-  - cpp
-  - live-coding
+status: stable
+version: 26.601.1847
+tags: [ workflow, cpp, live-coding ]
 ---
 
 # Workflow: C++ Iteration
@@ -23,7 +20,7 @@ See: [Live Coding reference](../unreal/live-coding.md),
 
 ## Preconditions
 
-- Editor is running (Companion shows `SB v1.3.x` in the status bar).
+- Editor is running (Companion shows `SB v1.4.x` in the status bar).
 - The change is patchable by Live Coding (method bodies / inline edits;
   NOT new UCLASS / module additions — those need `project_build`).
 - The project has at least one C++ module (`*.Build.cs` under `Source/`).

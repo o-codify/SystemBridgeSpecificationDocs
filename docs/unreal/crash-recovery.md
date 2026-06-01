@@ -1,12 +1,9 @@
 ---
 id: crash-recovery
 title: Crash Recovery
-status: draft
-version: 26.601.1517
-tags:
-  - unreal
-  - crash
-  - watchdog
+status: stable
+version: 26.601.1817
+tags: [ unreal, crash, watchdog ]
 ---
 
 # Crash Recovery

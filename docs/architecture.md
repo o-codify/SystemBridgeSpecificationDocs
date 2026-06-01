@@ -1,11 +1,9 @@
 ---
 id: architecture
 title: Architecture
-status: draft
-version: 26.601.1517
-tags:
-  - architecture
-  - internals
+status: stable
+version: 26.601.1817
+tags: [ architecture, internals ]
 ---
 
 # Architecture

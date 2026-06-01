@@ -1,10 +1,9 @@
 ---
 id: changelog
 title: Changelog
-status: draft
-version: 26.601.1517
-tags:
-  - changelog
+status: stable
+version: 26.601.1847
+tags: [ changelog ]
 ---
 
 # Changelog
@@ -13,7 +12,13 @@ Milestones for SystemBridge as a whole — daemon (`sb.exe`), plugins,
 and the Unreal Companion sub-plugin. Individual companion versions are
 also captured in [companion plugin reference](unreal/companion.md).
 
-## Recent: Companion v1.3.x — Blueprint authoring depth
+## Recent: Companion v1.4.x — multiplayer authoring
+
+| Date | Tag | What |
+|---|---|---|
+| 2026-Q2 | **Companion v1.4.0** | Replication authoring. `ConfigureCustomEvent` writes UK2Node_CustomEvent::FunctionFlags (Multicast / Server / Client + Reliable) + `bCallInEditor`. `AddEditableEventParam` builds typed UserDefinedPins on custom events / function entries. `SetVariableReplication` sets CPF_Net / CPF_RepNotify on FBPVariableDescription, sets RepNotifyFunc, auto-creates OnRep_<var> stub function graph. Three MCP tools: `bp_custom_event_configure`, `bp_event_add_param`, `bp_variable_set_replication`. Closes the multiplayer authoring gap — networked features were impossible to author headless before. See [blueprint authoring → replication](unreal/blueprint-authoring.md#replication). |
+
+## Companion v1.3.x — Blueprint authoring depth
 
 | Date | Tag | What |
 |---|---|---|
