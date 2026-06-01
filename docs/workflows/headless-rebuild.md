@@ -1,12 +1,9 @@
 ---
 id: workflow-headless-rebuild
 title: "Workflow: Headless Rebuild"
-status: review
-version: 26.601.1529
-tags:
-  - workflow
-  - build
-  - ubt
+status: stable
+version: 26.601.1817
+tags: [ workflow, build, ubt ]
 ---
 
 # Workflow: Headless Rebuild

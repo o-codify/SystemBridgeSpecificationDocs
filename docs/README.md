@@ -1,11 +1,9 @@
 ---
 id: systembridge-overview
 title: SystemBridge — Overview
-status: review
-version: 26.601.1519
-tags:
-  - overview
-  - index
+status: stable
+version: 26.601.1817
+tags: [ overview, index ]
 ---
 
 # SystemBridge

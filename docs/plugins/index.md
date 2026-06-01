@@ -1,11 +1,9 @@
 ---
 id: plugins-index
 title: Plugins — Index
-status: review
-version: 26.601.1522
-tags:
-  - plugins
-  - index
+status: stable
+version: 26.601.1817
+tags: [ plugins, index ]
 ---
 
 # Plugins — Index

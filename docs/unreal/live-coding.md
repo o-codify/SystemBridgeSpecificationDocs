@@ -1,12 +1,9 @@
 ---
 id: live-coding
 title: Live Coding
-status: review
-version: 26.601.1527
-tags:
-  - unreal
-  - live-coding
-  - cpp
+status: stable
+version: 26.601.1817
+tags: [ unreal, live-coding, cpp ]
 ---
 
 # Live Coding

@@ -1,11 +1,9 @@
 ---
 id: installation
 title: Installation
-status: review
-version: 26.601.1520
-tags:
-  - installation
-  - setup
+status: stable
+version: 26.601.1817
+tags: [ installation, setup ]
 ---
 
 # Installation

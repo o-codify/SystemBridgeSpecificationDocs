@@ -1,11 +1,9 @@
 ---
 id: architecture
 title: Architecture
-status: review
-version: 26.601.1520
-tags:
-  - architecture
-  - internals
+status: stable
+version: 26.601.1817
+tags: [ architecture, internals ]
 ---
 
 # Architecture

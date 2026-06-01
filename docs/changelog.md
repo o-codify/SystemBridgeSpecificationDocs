@@ -1,10 +1,9 @@
 ---
 id: changelog
 title: Changelog
-status: review
-version: 26.601.1521
-tags:
-  - changelog
+status: stable
+version: 26.601.1817
+tags: [ changelog ]
 ---
 
 # Changelog

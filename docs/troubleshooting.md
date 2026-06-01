@@ -1,10 +1,9 @@
 ---
 id: troubleshooting
 title: Troubleshooting
-status: review
-version: 26.601.1521
-tags:
-  - troubleshooting
+status: stable
+version: 26.601.1817
+tags: [ troubleshooting ]
 ---
 
 # Troubleshooting

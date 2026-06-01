@@ -1,11 +1,9 @@
 ---
 id: asset-management
 title: Asset Management
-status: review
-version: 26.601.1528
-tags:
-  - unreal
-  - assets
+status: stable
+version: 26.601.1817
+tags: [ unreal, assets ]
 ---
 
 # Asset Management

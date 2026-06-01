@@ -1,12 +1,9 @@
 ---
 id: plugin-unreal
 title: "Plugin: unreal"
-status: review
-version: 26.601.1525
-tags:
-  - plugin
-  - unreal
-  - ue
+status: stable
+version: 26.601.1817
+tags: [ plugin, unreal, ue ]
 ---
 
 # Plugin: `unreal`
