@@ -1,8 +1,8 @@
 ---
 id: workflow-headless-rebuild
 title: "Workflow: Headless Rebuild"
-status: draft
-version: 26.601.1507
+status: review
+version: 26.601.1529
 tags:
   - workflow
   - build
