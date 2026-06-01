@@ -1,8 +1,8 @@
 ---
 id: unreal-deep-dive
 title: Unreal — Deep Dive
-status: draft
-version: 26.601.1500
+status: review
+version: 26.601.1523
 tags:
   - unreal
   - ue
