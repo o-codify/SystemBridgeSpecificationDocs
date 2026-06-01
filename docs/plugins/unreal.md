@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.601.1817
+version: 26.601.1847
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -127,6 +127,9 @@ end-to-end flow.
 | `bp_node_get_subsystem_target` | **v1.0+** | Configure `K2Node_GetSubsystem`. |
 | `bp_node_input_action_target` | **v1.0+** | Configure `K2Node_EnhancedInputAction`. |
 | `bp_event_node_add` / `bp_event_find` / `bp_custom_event_add` | **v1.0+** | Event-graph entry points (ReceiveBeginPlay / Tick / custom). |
+| `bp_custom_event_configure` | **v1.4+** | Configure replication on a K2Node_CustomEvent — net_mode (multicast / server / client / notreplicated), reliable, call_in_editor. The editor's right-click "Replicates" dropdown headlessly. |
+| `bp_event_add_param` | **v1.4+** | Add a typed output parameter to a custom event / function entry. Same pin_category taxonomy as `bp_variable_add_typed`. |
+| `bp_variable_set_replication` | **v1.4+** | Set replication on a member variable — none / replicated / repnotify. Auto-creates `OnRep_<var>` function graph for repnotify. |
 
 ### PIE (Play In Editor)
 
