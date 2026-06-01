@@ -2,7 +2,7 @@
 id: systembridge-overview
 title: SystemBridge — Overview
 status: stable
-version: 26.601.1847
+version: 26.601.2308
 tags: [ overview, index ]
 ---
 
@@ -91,6 +91,11 @@ Three loosely-coupled goals:
 - "Make a Blueprint event multicast / replicate a variable." →
   [blueprint authoring → replication](unreal/blueprint-authoring.md#replication)
   → `bp_custom_event_configure` + `bp_variable_set_replication`.
+- "Clone a DataTable row and tweak a field with parens in its name." →
+  [asset management → DataTable rows](unreal/asset-management.md#datatable-rows)
+  → `dt_row_add` + `dt_row_set_field`.
+- "Editor is closed; bring it up." → `unreal_editor_launch` (cold-start
+  counterpart to `editor_restart`).
 
 ## Repository
 
