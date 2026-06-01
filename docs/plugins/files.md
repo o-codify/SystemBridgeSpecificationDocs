@@ -1,8 +1,8 @@
 ---
 id: plugin-files
 title: "Plugin: files"
-status: draft
-version: 26.601.1458
+status: review
+version: 26.601.1523
 tags:
   - plugin
   - files
