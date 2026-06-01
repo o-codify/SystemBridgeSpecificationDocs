@@ -2,7 +2,7 @@
 id: asset-management
 title: Asset Management
 status: stable
-version: 26.601.1817
+version: 26.601.2300
 tags: [ unreal, assets ]
 ---
 
@@ -123,6 +123,96 @@ unreal_asset_referencers asset_path="/Game/.../AM_HardLanding_Forward"
 ```
 
 `include_hard` / `include_soft` (default both true).
+
+## DataTable rows
+
+**Companion v1.5.0+**. Stock UE 5.7 Python only exposes
+`DataTableFunctionLibrary.fill_data_table_from_csv_string` /
+`_from_json_string`, both of which:
+
+- REPLACE the whole table (no per-row write).
+- Re-import every row from struct-text, which silently **corrupts**
+  UserDefinedStruct fields whose names contain `()`
+  (e.g. `Parameters.MaximumRange(InMetres)` becomes `0` on every row
+  because the tokenizer treats the parens as a nested struct).
+
+Companion's three new tools do per-row authoring without the round-trip.
+
+### `dt_row_add`
+
+Add a row. With `from_row` set, the new row is a **binary copy** of
+that existing row — every byte preserved, parens-named fields
+intact. Wraps `UDataTable::AddRow` directly.
+
+```
+unreal_dt_row_add dt_path="/Game/Survival/Weapons/DT_Weapons"
+                  row_name="AK47"
+                  from_row="M416"
+  → {success: true, data_table, row_name, from_row}
+```
+
+Without `from_row` the row is freshly zeroed.
+
+### `dt_row_set_field`
+
+Set a single (possibly nested) field on a row. Path syntax: `.` as
+the segment separator; field names **verbatim** — including names
+with `()`. Value goes through `FProperty::ImportText_InContainer` on
+the resolved leaf, so it's parsed by the property's own type-aware
+parser (NOT struct-text).
+
+```
+unreal_dt_row_set_field dt_path=... row_name="AK47"
+                        field_path="DisplayName" value="AK-47"
+
+unreal_dt_row_set_field dt_path=... row_name="AK47"
+                        field_path="Parameters.MaximumRange(InMetres)"
+                        value="300.0"
+
+unreal_dt_row_set_field dt_path=... row_name="AK47"
+                        field_path="CoreData.Mesh"
+                        value="/Game/Weapons/SK_AK47.SK_AK47"
+```
+
+Supports scalar leaves, enum literals, FName, object references
+(`/Game/...` paths), and nested struct descent across multiple
+`FStructProperty` hops.
+
+### `package_discard_changes`
+
+Drop pending in-memory changes on a package — reload from disk.
+Mirror of "Right-click → Revert" in the Content Browser, but
+headless.
+
+```
+unreal_package_discard_changes asset_path="/Game/.../DT_Weapons"
+  → {success: true, asset_path}
+```
+
+Use to recover from a botched fill before it gets persisted by
+`editor_save_all_dirty` / `editor_restart`. Also paired with
+`editor_restart skip_save_all_dirty=true` for the heavier path
+(quit without persisting anything).
+
+### End-to-end recipe — "clone M416 → AK-47"
+
+```
+# 1. Clone the row byte-for-byte.
+unreal_dt_row_add dt_path="/Game/.../DT_Weapons" row_name="AK47" from_row="M416"
+
+# 2. Override the fields that differ.
+unreal_dt_row_set_field dt_path=... row_name="AK47"
+                        field_path="DisplayName" value="AK-47"
+unreal_dt_row_set_field dt_path=... row_name="AK47"
+                        field_path="CoreData.Mesh"
+                        value="/Game/Weapons/SK_AK47.SK_AK47"
+unreal_dt_row_set_field dt_path=... row_name="AK47"
+                        field_path="Parameters.MaximumRange(InMetres)"
+                        value="300.0"
+```
+
+All other rows untouched; all UDS fields including the parens-named
+one preserved exactly.
 
 ## Lifecycle
 
