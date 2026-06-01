@@ -1,8 +1,8 @@
 ---
 id: installation
 title: Installation
-status: draft
-version: 26.601.1456
+status: review
+version: 26.601.1520
 tags:
   - installation
   - setup
