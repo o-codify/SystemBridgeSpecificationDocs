@@ -2,7 +2,7 @@
 id: changelog
 title: Changelog
 status: stable
-version: 26.601.1847
+version: 26.601.2301
 tags: [ changelog ]
 ---
 
@@ -12,7 +12,15 @@ Milestones for SystemBridge as a whole — daemon (`sb.exe`), plugins,
 and the Unreal Companion sub-plugin. Individual companion versions are
 also captured in [companion plugin reference](unreal/companion.md).
 
-## Recent: Companion v1.4.x — multiplayer authoring
+## Recent: Companion v1.5.x — DataTable authoring + cold-start
+
+| Date | Tag | What |
+|---|---|---|
+| 2026-Q2 | **Companion v1.5.0** | DataTable row authoring without struct-text round-trip. `AddDataTableRow` (UDataTable::AddRow + optional binary memcpy from existing row), `SetDataTableRowField` (dotted-path resolver + FProperty::ImportText on leaf — works on UserDefinedStruct fields whose names contain `()` that the stock fill APIs corrupt), `DiscardPackageChanges` (EditorLoadingAndSavingUtils::ReloadPackages — drop dirty in-memory package). Three MCP tools: `dt_row_add`, `dt_row_set_field`, `package_discard_changes`. Closes the gameplay-DataTable authoring gap. See [asset management → DataTable rows](unreal/asset-management.md#datatable-rows). |
+| 2026-Q2 | sb-unreal | New tool `editor_launch` — cold-start a closed UE editor. Resolves engine binary from EngineAssociation, spawns detached + polls until alive. Idempotent. Closes the no-tool-for-cold-start gap (workaround was shelling out to `Start-Process UnrealEditor.exe`). |
+| 2026-Q2 | sb-unreal | `editor_restart` adds `skip_save_all_dirty` — quit without persisting dirty assets. For recovery from a known-bad in-memory state. |
+
+## Companion v1.4.x — multiplayer authoring
 
 | Date | Tag | What |
 |---|---|---|
