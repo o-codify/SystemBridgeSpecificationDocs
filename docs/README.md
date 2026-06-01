@@ -2,7 +2,7 @@
 id: systembridge-overview
 title: SystemBridge — Overview
 status: stable
-version: 26.601.1817
+version: 26.601.1831
 tags: [ overview, index ]
 ---
 
@@ -88,6 +88,9 @@ Three loosely-coupled goals:
 - "Set a `AnimMontage` reference on a Blueprint pin without clicking." →
   [blueprint authoring](unreal/blueprint-authoring.md#object-references-on-pins)
   → `bp_node_pin_set_object`.
+- "Make a Blueprint event multicast / replicate a variable." →
+  [blueprint authoring → replication](unreal/blueprint-authoring.md#replication)
+  → `bp_custom_event_configure` + `bp_variable_set_replication`.
 
 ## Repository
 
