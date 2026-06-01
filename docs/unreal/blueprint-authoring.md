@@ -2,7 +2,7 @@
 id: blueprint-authoring-headless
 title: Blueprint Authoring (headless)
 status: stable
-version: 26.601.1932
+version: 26.601.1933
 tags: [ unreal, blueprint, authoring ]
 ---
 
@@ -440,6 +440,28 @@ bp_node_link_pins(..., src_pin_name="Montage", dst_pin_name="Anim Montage")
 
 After compile + 2-player PIE, both the listen-server and the
 simulated proxy play the hard-landing montage synchronously.
+
+> **Verified 2026-06-02** in `ALS_UltimateWarfare` (Companion v1.4.0),
+> 2-player PIE, bidirectional (host-falls→client-sees and
+> client-falls→host-sees), hard and medium tiers. Two gotchas worth
+> recording for anyone verifying replication headlessly:
+>
+> 1. **Python `call_method` / ProcessEvent bypasses RPC net routing.**
+>    Invoking a custom event from Python runs its *body locally* and does
+>    NOT send the multicast/server RPC over the wire (a Server event body
+>    runs on the caller, a Multicast plays only locally). So you cannot
+>    confirm replication by calling the event from Python — drive the real
+>    gameplay path (e.g. a genuine fall so the compiled `OnLanded` graph
+>    fires) instead.
+> 2. **Catch transient montages with a per-tick latch, not one-shot
+>    polls.** A landing montage lasts ~1.5–3.4 s; reasoning latency between
+>    one-shot `unreal_run_python` polls easily overshoots the window.
+>    Register `unreal.register_slate_post_tick_callback(cb)` that records
+>    the first non-None `anim_instance.get_current_active_montage()` on
+>    each world, arm it, trigger the fall, then read the latch — timing
+>    becomes irrelevant. (`bp_graph_nodes_list` also does not surface an
+>    object pin's `DefaultObject`, so set/track montage defaults via
+>    `bp_node_pin_set_object`, not by reading the node dump.)
 
 ## Compile + save
 
