@@ -2,7 +2,7 @@
 id: blueprint-authoring-headless
 title: Blueprint Authoring (headless)
 status: stable
-version: 26.601.1847
+version: 26.601.1932
 tags: [ unreal, blueprint, authoring ]
 ---
 
@@ -219,10 +219,14 @@ For new user-named events other graphs can call.
 ```
 bp_node_link_pins(
   bp_path, graph_name,
-  src_node_guid, src_pin_name,
-  dst_node_guid, dst_pin_name,
+  src_node_guid, src_pin,      # NB: param is `src_pin`, not `src_pin_name`
+  dst_node_guid, dst_pin,      # NB: param is `dst_pin`, not `dst_pin_name`
 )
 ```
+
+> **Verified 2026-06-02.** The exact pin-link param names are `src_pin` /
+> `dst_pin` (passing `src_pin_name`/`dst_pin_name` errors with
+> `src_pin is required`). `bp_custom_event_add` takes `custom_event_name`.
 
 Schema validates type compatibility — incompatible types return
 `{success: false}` with the pin type info so the agent can `MakeStruct`
