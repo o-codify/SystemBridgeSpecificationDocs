@@ -2,7 +2,7 @@
 id: blueprint-authoring-headless
 title: Blueprint Authoring (headless)
 status: stable
-version: 26.601.1933
+version: 26.601.2006
 tags: [ unreal, blueprint, authoring ]
 ---
 
@@ -198,6 +198,19 @@ configure it after creation:
 
 Each configurator reconstructs pins automatically. After a configurator
 the node's pin set is final — wire it now.
+
+> **Gotcha — self-context variables (observed 2026-06-02).** When
+> `bp_node_variable_target` targets a variable on the BP's *own* class and
+> you pass `member_owner_class_path = <BP>.<BP>_C`, the resulting
+> Get/Set node's `self` pin is NOT flagged self-context. It compiles to
+> `Variable node uses an invalid target. May depend on a pruned node not
+> connected to the execution chain.` and the BP goes `BS_Error` — even
+> though `bp_compile_and_save` returns `success:true` (success means
+> "saved", not "compiled clean"; read the compiler log or rely on PIE's
+> pre-flight to surface it). **Fix:** create a `K2Node_Self`
+> (`/Script/BlueprintGraph.K2Node_Self`, output pin `self`) and link it
+> into the variable node's `self` pin. Ideally the tool would set
+> self-context automatically when the owner class is the BP itself.
 
 ### Events
 
