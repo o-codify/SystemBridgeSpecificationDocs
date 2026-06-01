@@ -1,8 +1,8 @@
 ---
 id: systembridgecompanion-plugin
 title: SystemBridgeCompanion Plugin
-status: draft
-version: 26.601.1501
+status: review
+version: 26.601.1524
 tags:
   - unreal
   - companion
