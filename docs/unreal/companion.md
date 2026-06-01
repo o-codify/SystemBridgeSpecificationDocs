@@ -2,7 +2,7 @@
 id: systembridgecompanion-plugin
 title: SystemBridgeCompanion Plugin
 status: stable
-version: 26.601.1847
+version: 26.601.2300
 tags: [ unreal, companion, cpp ]
 ---
 
@@ -69,7 +69,7 @@ build will hit "file in use" on the DLL link step).
 v1.3.1+ adds a permanent widget on the LevelEditor's status bar:
 
 ```
-[● green dot] SB v1.4.0
+[● green dot] SB v1.5.0
 ```
 
 Tooltip lists what's armed and the repo URL. Hover-to-confirm replaces
@@ -97,8 +97,9 @@ having to call `companion_status`.
 | **1.3.3** | PIE pre-flight: live in-memory BP error scan via `TObjectIterator<UBlueprint>`. The previous AssetRegistry-tag scan missed BPs whose status was live-in-memory but not yet serialized. Used by `pie_start` to refuse with a structured error instead of dispatching into UE's modal compile-error dialog. |
 | **1.3.4** | Object/asset references in Blueprints (headless): `SetPinDefaultObject` (writes to `Pin->DefaultObject`, the slot string defaults can't touch), `AddTypedMemberVariable` (full FEdGraphPinType — object / class / soft_object / soft_class / interface / struct / enum / containers), `CreateObjectLiteralNode` (`K2Node_Literal` + `SetObjectRef`). See [blueprint authoring](blueprint-authoring.md). |
 | **1.4.0** | Replication authoring — `ConfigureCustomEvent` (UK2Node_CustomEvent::FunctionFlags: Multicast / Server / Client + Reliable + bCallInEditor), `AddEditableEventParam` (typed UserDefinedPin on custom events / function entries), `SetVariableReplication` (CPF_Net / CPF_RepNotify on FBPVariableDescription + auto-create OnRep_* stub). Closes the multiplayer authoring gap — networked features were impossible to author headless before. See [blueprint authoring → replication](blueprint-authoring.md#replication). |
+| **1.5.0** | DataTable row authoring + package safety — `AddDataTableRow` (binary memcpy from an existing row OR fresh zeroed buffer, no struct-text round-trip), `SetDataTableRowField` (FProperty::ImportText_InContainer on a dotted-path leaf — works on nested UserDefinedStruct fields including names with parens like `Parameters.MaximumRange(InMetres)` that the stock fill APIs corrupt), `DiscardPackageChanges` (drops dirty in-memory package, re-loads from disk — headless equivalent of Content Browser's Revert). Closes the gameplay-DataTable authoring gap. See [asset management → DataTable rows](asset-management.md#datatable-rows). |
 
-## Future roadmap (v1.5+)
+## Future roadmap (v1.6+)
 
 - Full BT graph node authoring (BTGraph + runtime in lockstep).
 - Decorator / service attachment.
