@@ -2,7 +2,7 @@
 id: blueprint-authoring-headless
 title: Blueprint Authoring (headless)
 status: stable
-version: 26.601.2006
+version: 26.601.2245
 tags: [ unreal, blueprint, authoring ]
 ---
 
