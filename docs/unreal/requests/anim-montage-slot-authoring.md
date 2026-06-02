@@ -1,7 +1,7 @@
 ---
 id: request-animmontage-slot-track-authoring-upper-body-reloads
 title: "Request: AnimMontage slot-track authoring (upper-body reloads)"
-status: draft
+status: request
 version: 26.602.545
 tags: []
 ---
