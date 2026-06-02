@@ -2,7 +2,7 @@
 id: changelog
 title: Changelog
 status: stable
-version: 26.601.2308
+version: 26.602.557
 tags: [ changelog ]
 ---
 
@@ -12,7 +12,13 @@ Milestones for SystemBridge as a whole — daemon (`sb.exe`), plugins,
 and the Unreal Companion sub-plugin. Individual companion versions are
 also captured in [companion plugin reference](unreal/companion.md).
 
-## Recent: Companion v1.5.x — DataTable authoring + cold-start
+## Recent: Companion v1.6.x — AnimMontage slot-track authoring
+
+| Date | Tag | What |
+|---|---|---|
+| 2026-Q2 | **Companion v1.6.0** | `CreateAnimMontageFromTemplate` duplicates a template montage and swaps the AnimSequence inside every slot track's segment for a new clip. Preserves slot layout (e.g. ALS "Arm L"/"Arm R"), group name ("Layering Override Group"), section markers, blend in/out, notifies. Skeleton compatibility check via `IsCompatibleForEditor`. Closes the per-weapon upper-body reload gap — UE 5.7 Python can't author `UAnimMontage::SlotAnimTracks` at all and `AnimMontageFactory` always lands on `DefaultGroup.DefaultSlot` (full-body). One MCP tool: `anim_montage_create_from_template`. See [asset management → AnimMontage from template](unreal/asset-management.md#animmontage-from-template). |
+
+## Companion v1.5.x — DataTable authoring + cold-start
 
 | Date | Tag | What |
 |---|---|---|
