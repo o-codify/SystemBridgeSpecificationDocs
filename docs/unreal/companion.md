@@ -2,7 +2,7 @@
 id: systembridgecompanion-plugin
 title: SystemBridgeCompanion Plugin
 status: stable
-version: 26.602.556
+version: 26.602.559
 tags: [ unreal, companion, cpp ]
 ---
 

@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.602.557
+version: 26.602.559
 tags: [ plugin, unreal, ue ]
 ---
 
