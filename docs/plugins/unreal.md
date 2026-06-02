@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.602.559
+version: 26.602.1237
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -223,6 +223,8 @@ See [PIE workflow](../unreal/pie-workflow.md).
 | `anim_blueprint_nodes` | Anim nodes filtered by class; includes referenced anim assets. |
 | `anim_blueprint_set_node_asset_override` | Override the anim asset on a SequencePlayer / BlendSpacePlayer node. |
 | `anim_montage_create_from_template` | **v1.6+** Create a new UAnimMontage by duplicating a template (preserves slot layout, group, sections, blends, notifies) and replacing the AnimSequence in every segment. Headless authoring of upper-body / additive-slot montages. |
+| `anim_montage_add_notify` | **v1.7+** Add a skeleton/named FAnimNotifyEvent at a chosen time + optional notify-state duration. Resolves or creates the NotifyTrack; registers the name on the skeleton; idempotent on name+time+track. |
+| `anim_montage_remove_notify_by_name` | **v1.7+** Remove every FAnimNotifyEvent on the montage with the given name. Returns count_removed. |
 
 ## SB_JSON marker protocol
 
