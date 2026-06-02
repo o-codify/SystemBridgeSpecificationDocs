@@ -2,7 +2,7 @@
 id: systembridgecompanion-plugin
 title: SystemBridgeCompanion Plugin
 status: stable
-version: 26.602.559
+version: 26.602.1331
 tags: [ unreal, companion, cpp ]
 ---
 
@@ -69,7 +69,7 @@ build will hit "file in use" on the DLL link step).
 v1.3.1+ adds a permanent widget on the LevelEditor's status bar:
 
 ```
-[● green dot] SB v1.6.0
+[● green dot] SB v1.7.0
 ```
 
 Tooltip lists what's armed and the repo URL. Hover-to-confirm replaces
@@ -99,8 +99,9 @@ having to call `companion_status`.
 | **1.4.0** | Replication authoring — `ConfigureCustomEvent` (UK2Node_CustomEvent::FunctionFlags: Multicast / Server / Client + Reliable + bCallInEditor), `AddEditableEventParam` (typed UserDefinedPin on custom events / function entries), `SetVariableReplication` (CPF_Net / CPF_RepNotify on FBPVariableDescription + auto-create OnRep_* stub). Closes the multiplayer authoring gap — networked features were impossible to author headless before. See [blueprint authoring → replication](blueprint-authoring.md#replication). |
 | **1.5.0** | DataTable row authoring + package safety — `AddDataTableRow` (binary memcpy from an existing row OR fresh zeroed buffer, no struct-text round-trip), `SetDataTableRowField` (FProperty::ImportText_InContainer on a dotted-path leaf — works on nested UserDefinedStruct fields including names with parens like `Parameters.MaximumRange(InMetres)` that the stock fill APIs corrupt), `DiscardPackageChanges` (drops dirty in-memory package, re-loads from disk — headless equivalent of Content Browser's Revert). Closes the gameplay-DataTable authoring gap. See [asset management → DataTable rows](asset-management.md#datatable-rows). |
 | **1.6.0** | AnimMontage slot-track authoring — `CreateAnimMontageFromTemplate` duplicates a template montage (preserving its slot layout, group name, sections, blends, notifies) and swaps the AnimSequence inside every segment for a new clip. UE 5.7 Python can't author `UAnimMontage::SlotAnimTracks` at all (unbound TArray) and `AnimMontageFactory` always lands new montages on `DefaultGroup.DefaultSlot` (full-body). Unblocks per-weapon upper-body reload authoring — e.g. ALS "Arm L"/"Arm R" + "Layering Override Group" reloads, per gun, from a single template. See [asset management → AnimMontage from template](asset-management.md#animmontage-from-template). |
+| **1.7.0** | AnimMontage notify authoring — `AddAnimMontageNotify` (skeleton/named FAnimNotifyEvent at a chosen time + optional notify-state duration; resolves or creates the track; registers the name on the skeleton; idempotent on name+time+track) and `RemoveAnimMontageNotifyByName` (TArray::RemoveAll predicate). UE 5.7 Python's `AnimationLibrary.add_animation_notify_event` needs a UClass — passing None creates a notify literally named "None"; the notifies array is protected for direct write. Unblocks placing "ReloadWeapon" (and friends) at a chosen time on per-weapon montages. See [asset management → AnimMontage notifies](asset-management.md#animmontage-notifies). |
 
-## Future roadmap (v1.7+)
+## Future roadmap (v1.8+)
 
 - Full BT graph node authoring (BTGraph + runtime in lockstep).
 - Decorator / service attachment.
