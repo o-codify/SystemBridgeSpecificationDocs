@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.601.2308
+version: 26.602.559
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -222,6 +222,7 @@ See [PIE workflow](../unreal/pie-workflow.md).
 | `anim_blueprint_graphs` | Animation graphs (state machines, sub-graphs) in an AnimBlueprint. |
 | `anim_blueprint_nodes` | Anim nodes filtered by class; includes referenced anim assets. |
 | `anim_blueprint_set_node_asset_override` | Override the anim asset on a SequencePlayer / BlendSpacePlayer node. |
+| `anim_montage_create_from_template` | **v1.6+** Create a new UAnimMontage by duplicating a template (preserves slot layout, group, sections, blends, notifies) and replacing the AnimSequence in every segment. Headless authoring of upper-body / additive-slot montages. |
 
 ## SB_JSON marker protocol
 

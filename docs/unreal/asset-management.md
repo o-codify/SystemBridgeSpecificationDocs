@@ -2,7 +2,7 @@
 id: asset-management
 title: Asset Management
 status: stable
-version: 26.601.2308
+version: 26.602.559
 tags: [ unreal, assets ]
 ---
 
@@ -213,6 +213,97 @@ unreal_dt_row_set_field dt_path=... row_name="AK47"
 
 All other rows untouched; all UDS fields including the parens-named
 one preserved exactly.
+
+## AnimMontage from template
+
+**Companion v1.6.0+**. UE 5.7 Python can't author
+`UAnimMontage::SlotAnimTracks` at all (the property is an unbound
+`TArray<FSlotAnimationTrack>`), and `AnimMontageFactory` always lands
+new montages on `DefaultGroup.DefaultSlot` (full-body). Per-weapon
+**upper-body** reload montages (ALS-style "Arm L"/"Arm R" slots in
+the "Layering Override Group") couldn't be created headless.
+
+`anim_montage_create_from_template` clones a known-good template that
+already has the desired slot layout and swaps the clip inside every
+slot track's segment:
+
+```
+unreal_anim_montage_create_from_template
+  template_montage_path="/Game/.../ALS_LoadedReload_Montage"
+  source_animation_path="/Game/.../ALSP2_Reloading_Rifle_AK47"
+  dst_path="/Game/.../MM_AK47_Reload_Montage"
+  → {success: true, template, source_animation, dst}
+```
+
+What survives the clone:
+
+- Slot LAYOUT (e.g. `Arm L`, `Arm R`, `Spine`, `Head`).
+- Group name (e.g. `Layering Override Group`).
+- Section markers + chains (`next_section_name`).
+- Blend in / out.
+- Notifies.
+
+What changes:
+
+- Every `FAnimSegment.AnimReference` is swapped for `source_animation`.
+- Segment timings are retimed to the new clip's `GetPlayLength()`
+  (`AnimStartTime=0`, `AnimEndTime=length`, `PlayRate=1`, `LoopCount=1`).
+
+Verification after authoring:
+
+```
+unreal_anim_sequence_info anim_path=".../MM_AK47_Reload_Montage"
+  → inspect section list and play_length
+
+unreal_run_python script="""
+import unreal, json
+m = unreal.EditorAssetLibrary.load_asset('/Game/.../MM_AK47_Reload_Montage')
+slots = unreal.AnimationLibrary.get_montage_slot_names(m)
+result = {'slots': [str(s) for s in slots],
+          'group': str(m.get_group_name())}
+print('<<<SB_JSON>>>'); print(json.dumps(result)); print('<<<END_SB_JSON>>>')
+"""
+  → slots: ["Arm L", "Arm R", ...], group: "Layering Override Group"
+```
+
+In PIE the reload plays upper-body — legs keep locomotion while running.
+
+Skeleton compatibility is checked via `USkeleton::IsCompatibleForEditor`.
+Companion refuses if `source_animation`'s skeleton is unrelated;
+the caller is responsible for choosing a clip authored on (or
+compatible with) the template's skeleton.
+
+Refuses to overwrite an existing asset at `dst_path` — `asset_delete`
+first if you mean to.
+
+### End-to-end recipe — per-weapon reload montages
+
+```
+# 12-weapon arsenal, one template per family.
+TEMPLATES = {
+    "Rifle":  "/Game/.../ALS_LoadedReload_Montage",
+    "Pistol": "/Game/.../A_HG_Reload_Montage",
+    "Shotgun":"/Game/.../A_SG_Reload_Montage",
+}
+CLIPS = {
+    "AK47":  ("Rifle",  "/Game/.../ALSP2_Reloading_Rifle_AK47"),
+    "M4A4":  ("Rifle",  "/Game/.../ALSP2_Reloading_Rifle_M4A4"),
+    "Famas": ("Rifle",  "/Game/.../ALSP2_Reloading_Rifle_Famas"),
+    "C8":    ("Rifle",  "/Game/.../ALSP2_Reloading_Rifle_C8"),
+    "AS50":  ("Rifle",  "/Game/.../ALSP2_Reloading_Rifle_AS50"),
+    "USP":   ("Pistol", "/Game/.../ALSP2_Reload_Pistol"),
+    ...
+}
+
+for weapon, (family, clip) in CLIPS.items():
+    unreal_anim_montage_create_from_template(
+        template_montage_path=TEMPLATES[family],
+        source_animation_path=clip,
+        dst_path=f"/Game/Weapons/Montages/MM_{weapon}_Reload_Montage",
+    )
+# then wire each into DT_Weapons via dt_row_set_field on
+# "PC ReloadAnimation" (a SoftObjectPath leaf).
+```
 
 ## Lifecycle
 
