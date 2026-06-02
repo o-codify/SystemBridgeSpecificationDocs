@@ -2,7 +2,7 @@
 id: asset-management
 title: Asset Management
 status: stable
-version: 26.601.2300
+version: 26.601.2308
 tags: [ unreal, assets ]
 ---
 

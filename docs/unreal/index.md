@@ -2,7 +2,7 @@
 id: unreal-deep-dive
 title: Unreal — Deep Dive
 status: stable
-version: 26.601.2300
+version: 26.601.2308
 tags: [ unreal, ue, index ]
 ---
 

@@ -2,7 +2,7 @@
 id: changelog
 title: Changelog
 status: stable
-version: 26.601.2301
+version: 26.601.2308
 tags: [ changelog ]
 ---
 
