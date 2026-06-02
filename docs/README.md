@@ -2,7 +2,7 @@
 id: systembridge-overview
 title: SystemBridge — Overview
 status: stable
-version: 26.602.559
+version: 26.602.1331
 tags: [ overview, index ]
 ---
 
@@ -100,6 +100,10 @@ Three loosely-coupled goals:
   an existing ALS reload, different clip." →
   [asset management → AnimMontage from template](unreal/asset-management.md#animmontage-from-template)
   → `anim_montage_create_from_template`.
+- "Drop a skeleton notify (e.g. `ReloadWeapon`) at a specific time on
+  a montage." →
+  [asset management → AnimMontage notifies](unreal/asset-management.md#animmontage-notifies)
+  → `anim_montage_add_notify`.
 
 ## Repository
 

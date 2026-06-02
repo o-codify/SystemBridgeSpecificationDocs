@@ -2,7 +2,7 @@
 id: asset-management
 title: Asset Management
 status: stable
-version: 26.602.559
+version: 26.602.1331
 tags: [ unreal, assets ]
 ---
 
@@ -304,6 +304,78 @@ for weapon, (family, clip) in CLIPS.items():
 # then wire each into DT_Weapons via dt_row_set_field on
 # "PC ReloadAnimation" (a SoftObjectPath leaf).
 ```
+
+## AnimMontage notifies
+
+**Companion v1.7.0+**. Skeleton/named notifies (the kind the AnimBP
+catches via `AnimNotify_<Name>` events — e.g. `ReloadWeapon` for the
+ALS ammo refill hook) couldn't be placed headless before v1.7:
+
+- `AnimationLibrary.add_animation_notify_event` requires a UClass.
+  Passing None creates a notify named literally `"None"`.
+- Class-based notifies do NOT trigger `AnimNotify_<Name>` AnimBP
+  events — only skeleton/named notifies do.
+- `get_animation_notify_events()` returns COPIES, so
+  `set_editor_property("notify_name", ...)` doesn't persist.
+- `copy_anim_notifies_from_sequence` exists but copies at the source's
+  absolute time and drops anything past dst length.
+
+### `anim_montage_add_notify`
+
+Add a skeleton/named notify at `trigger_time`:
+
+```
+unreal_anim_montage_add_notify
+  montage_path="/Game/.../MM_AK47_Reload_Montage"
+  notify_name="ReloadWeapon"
+  trigger_time=1.86
+  → {success: true, montage, notify_name, trigger_time, ...}
+```
+
+- `trigger_time` is clamped to `[0, montage.SequenceLength)` so it
+  always lands inside the clip.
+- `track_name` (optional): empty = first NotifyTrack; specified-but-
+  absent = a new track is created and used.
+- `notify_state_duration` > 0 makes it a notify-state with the given
+  length (clamped not to exceed the remaining time after
+  `trigger_time`).
+- Idempotent on `(name, trigger_time ±10ms, track)` — re-running is a
+  no-op success.
+- Registers the notify name on the skeleton via
+  `AddNewAnimationNotify` so the editor dropdown matches reality.
+
+### `anim_montage_remove_notify_by_name`
+
+Remove every notify on the montage with the given name:
+
+```
+unreal_anim_montage_remove_notify_by_name
+  montage_path="/Game/.../MM_AK47_Reload_Montage"
+  notify_name="OverlayOverride"
+  → {success: true, count_removed: 1}
+```
+
+Useful for stripping notifies the template carried that you don't
+want (e.g. the ALS templates' `OverlayOverride`).
+
+### End-to-end — per-weapon reload notify at 70% of clip length
+
+```
+for weapon in WEAPONS:
+    clip_len = inspect(f"/Game/.../MM_{weapon}_Reload_Montage").play_length
+    # Replace existing ReloadWeapon (if any) with a clean one at 70%.
+    unreal_anim_montage_remove_notify_by_name(
+        montage_path=f"/Game/.../MM_{weapon}_Reload_Montage",
+        notify_name="ReloadWeapon")
+    unreal_anim_montage_add_notify(
+        montage_path=f"/Game/.../MM_{weapon}_Reload_Montage",
+        notify_name="ReloadWeapon",
+        trigger_time=0.70 * clip_len)
+```
+
+Now short clips (2.0 s pistol) get the notify at 1.4 s instead of
+losing it to the 2.648 s absolute-time copy-from-sequence path; long
+clips (3.5 s rifle) get it at ~2.45 s. No end-of-montage hold needed.
 
 ## Lifecycle
 

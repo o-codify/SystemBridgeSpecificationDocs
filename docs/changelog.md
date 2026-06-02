@@ -2,7 +2,7 @@
 id: changelog
 title: Changelog
 status: stable
-version: 26.602.559
+version: 26.602.1331
 tags: [ changelog ]
 ---
 
@@ -12,7 +12,13 @@ Milestones for SystemBridge as a whole — daemon (`sb.exe`), plugins,
 and the Unreal Companion sub-plugin. Individual companion versions are
 also captured in [companion plugin reference](unreal/companion.md).
 
-## Recent: Companion v1.6.x — AnimMontage slot-track authoring
+## Recent: Companion v1.7.x — AnimMontage notify authoring
+
+| Date | Tag | What |
+|---|---|---|
+| 2026-Q2 | **Companion v1.7.0** | `AddAnimMontageNotify` (skeleton/named FAnimNotifyEvent + optional notify-state duration, resolves or creates the NotifyTrack, registers the name on the skeleton, idempotent on name+time+track) + `RemoveAnimMontageNotifyByName`. UE 5.7 Python can't write a *named* notify — `AnimationLibrary.add_animation_notify_event` requires a UClass, passing None makes a notify literally named "None". Two MCP tools: `anim_montage_add_notify`, `anim_montage_remove_notify_by_name`. See [asset management → AnimMontage notifies](unreal/asset-management.md#animmontage-notifies). |
+
+## Companion v1.6.x — AnimMontage slot-track authoring
 
 | Date | Tag | What |
 |---|---|---|
