@@ -2,7 +2,7 @@
 id: systembridge-overview
 title: SystemBridge — Overview
 status: stable
-version: 26.601.2308
+version: 26.602.557
 tags: [ overview, index ]
 ---
 
@@ -96,6 +96,10 @@ Three loosely-coupled goals:
   → `dt_row_add` + `dt_row_set_field`.
 - "Editor is closed; bring it up." → `unreal_editor_launch` (cold-start
   counterpart to `editor_restart`).
+- "Make a per-weapon upper-body reload montage — same slot layout as
+  an existing ALS reload, different clip." →
+  [asset management → AnimMontage from template](unreal/asset-management.md#animmontage-from-template)
+  → `anim_montage_create_from_template`.
 
 ## Repository
 
