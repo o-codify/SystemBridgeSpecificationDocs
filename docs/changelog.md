@@ -2,7 +2,7 @@
 id: changelog
 title: Changelog
 status: stable
-version: 26.603.1754
+version: 26.603.2027
 tags: [ changelog ]
 ---
 
@@ -16,6 +16,7 @@ also captured in [companion plugin reference](unreal/companion.md).
 
 | Date | Tag | What |
 |---|---|---|
+| 2026-Q2 | **Companion v1.10.2** | Bug fix for `bp_node_remove`. UE's `Graph->RemoveNode` broadcasts `OnGraphChanged` which triggers a compile-on-modify cleanup that swept "unreferenced" member variables — a destructive surprise when the user declared variables in advance of wiring them. Fix: snapshot `Blueprint->NewVariables` before the remove, restore any that disappear. Restore-only (never invents vars); logs a warning when a restore fires. |
 | 2026-Q2 | **Companion v1.10.1** | Bug fix for v1.10.0 rig variables. `URigVMController::AddVariableNode` was leaving broken nodes bound to `@@` because variables were added via `FBlueprintEditorUtils::AddMemberVariable` (BP-only) instead of the canonical `URigVMBlueprint::AddMemberVariable` (BP + RigVM model). Switched to the canonical surface for add / remove / list; CPPType comes from `RigVMTypeUtils::CPPTypeFromPinType`. Get/set node creation sanity-checks the returned binding and rolls back any half-bound node. Closes the v1.10.0 follow-up bug report. |
 | 2026-Q2 | **Companion v1.10.0** | Rig-variable authoring — completes the AnimBP-facing dynamic-input contract v1.9 left as static-defaults-only. `ControlRigVariableAdd` (FBlueprintEditorUtils::AddMemberVariable + direction-derived CPF flags; public variables become input pins on the AnimGraph Control Rig node), `ControlRigVariablesList` (name / cpp_type / cpp_type_object / direction / default — direction recovered from a `RigVar|Input/Output/Hidden` category tag), `ControlRigVariableRemove` (idempotent), `ControlRigVariableGetNodeAdd` + `SetNodeAdd` (`URigVMController::AddVariableNode` with CPPType + CPPTypeObject derived from the existing BP variable description). 5 MCP tools. Pure-C++ `BPTypeToRigVMType` maps PC_* + sub-object into RigVM's `FVector` / `int32` / `TArray<FTransform>` etc. format. See [control rig authoring → rig variables](unreal/control-rig-authoring.md#rig-variables-v110). |
 
