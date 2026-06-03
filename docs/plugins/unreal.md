@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.603.1516
+version: 26.603.1703
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -234,6 +234,19 @@ See [PIE workflow](../unreal/pie-workflow.md).
 | `struct_member_add` / `remove` / `rename` / `members_list` | **v1.8+** | UserDefinedStruct member authoring via FStructureEditorUtils. Same pin_category taxonomy as bp_variable_add_typed. |
 | `enum_entry_add` / `set_display_name` / `remove` | **v1.8+** | UserDefinedEnum entry authoring via FEnumEditorUtils. |
 | `enum_entries_list` | pure Python | List a UserDefinedEnum's entries. |
+
+### Control Rig (RigVM)
+
+| Tool | Companion | Purpose |
+|---|---|---|
+| `control_rig_create` | pure Python | Create a new ControlRigBlueprint via `ControlRigBlueprintFactory`. Optional `preview_skeletal_mesh`. Idempotent. |
+| `control_rig_graphs_list` | **v1.9+** | List rig graphs. v1.9 reports the main RigGraph; function-library graphs land in v1.10. |
+| `control_rig_nodes_list` | **v1.9+** | List nodes with name / title / RigUnit struct path / position / pin count. |
+| `control_rig_node_add` | **v1.9+** | Add a RigUnit node by `UScriptStruct` path. Returns the new node's name. |
+| `control_rig_node_remove` | **v1.9+** | Remove a node by name. Idempotent. |
+| `control_rig_pin_set_default` | **v1.9+** | Set a pin default. `pin_path` is dot-notation (`Item.Type`, `Translation.X`); value uses RigVM's text serializer. |
+| `control_rig_add_link` | **v1.9+** | Add an exec/data link between two pins (`PinName` or `Pin.SubPin`). |
+| `control_rig_compile` | **v1.9+** | RecompileVM + save. |
 
 ## SB_JSON marker protocol
 
