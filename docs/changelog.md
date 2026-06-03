@@ -2,7 +2,7 @@
 id: changelog
 title: Changelog
 status: stable
-version: 26.603.1516
+version: 26.603.1703
 tags: [ changelog ]
 ---
 
@@ -12,7 +12,13 @@ Milestones for SystemBridge as a whole — daemon (`sb.exe`), plugins,
 and the Unreal Companion sub-plugin. Individual companion versions are
 also captured in [companion plugin reference](unreal/companion.md).
 
-## Recent: Companion v1.8.x — headless data authoring
+## Recent: Companion v1.9.x — Control Rig (RigVM) authoring
+
+| Date | Tag | What |
+|---|---|---|
+| 2026-Q2 | **Companion v1.9.0** | Control Rig authoring — wraps `URigVMController` (RigVMDeveloper) so an agent can stand up a procedural-animation rig headlessly. `ControlRigGraphsList` (main RigGraph; function-library deferred to v1.10), `ControlRigNodesList` (name / title / RigUnit struct / position / pin count), `ControlRigAddUnitNode` (FRigUnit-derived `UScriptStruct` → node name), `ControlRigRemoveNode` (idempotent), `ControlRigPinSetDefault` (dot-notation pin path + RigVM text serializer), `ControlRigAddLink` (exec/data link, "Pin.SubPin" paths), `ControlRigCompile` (`RecompileVM` + `MarkBlueprintAsModified`). Uses `*Legacy.h` headers post-Modular-Rig migration. Asset creation rides on pure-Python `ControlRigBlueprintFactory`. 8 MCP tools. Closes the rig-authoring gap — UE 5.7 Python doesn't bind `URigVMController` at all. See [control rig authoring](unreal/control-rig-authoring.md). |
+
+## Companion v1.8.x — headless data authoring
 
 | Date | Tag | What |
 |---|---|---|

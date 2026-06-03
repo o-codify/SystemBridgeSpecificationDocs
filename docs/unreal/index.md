@@ -2,7 +2,7 @@
 id: unreal-deep-dive
 title: Unreal — Deep Dive
 status: stable
-version: 26.603.1516
+version: 26.603.1703
 tags: [ unreal, ue, index ]
 ---
 
@@ -30,6 +30,8 @@ For the tool catalog (every UE tool with one-line descriptions), see
   (LoadErrors, MapCheck, AssetCheck, …).
 - [Asset management](asset-management.md) — `assets_query`,
   `asset_describe`, references / dependencies.
+- [Control Rig authoring](control-rig-authoring.md) — headless RigVM graph
+  authoring via `URigVMController` (v1.9+).
 - [editor_status reference](#editor_status) (this page).
 
 ## When to use what

@@ -2,7 +2,7 @@
 id: systembridge-overview
 title: SystemBridge — Overview
 status: stable
-version: 26.603.1516
+version: 26.603.1703
 tags: [ overview, index ]
 ---
 
@@ -113,6 +113,9 @@ Three loosely-coupled goals:
 - "Create a new Blueprint subclass or DataAsset instance." →
   [data authoring → asset creation](unreal/data-authoring.md#asset-creation)
   → `bp_create` / `dataasset_create`.
+- "Stand up a Control Rig solver headlessly — add a Two Bone IK unit and wire it." →
+  [control rig authoring](unreal/control-rig-authoring.md)
+  → `control_rig_create` + `control_rig_node_add` + `control_rig_add_link` + `control_rig_compile`.
 
 ## Repository
 
