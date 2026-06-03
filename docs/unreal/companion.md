@@ -2,7 +2,7 @@
 id: systembridgecompanion-plugin
 title: SystemBridgeCompanion Plugin
 status: stable
-version: 26.602.1331
+version: 26.603.1512
 tags: [ unreal, companion, cpp ]
 ---
 
@@ -101,7 +101,7 @@ having to call `companion_status`.
 | **1.6.0** | AnimMontage slot-track authoring — `CreateAnimMontageFromTemplate` duplicates a template montage (preserving its slot layout, group name, sections, blends, notifies) and swaps the AnimSequence inside every segment for a new clip. UE 5.7 Python can't author `UAnimMontage::SlotAnimTracks` at all (unbound TArray) and `AnimMontageFactory` always lands new montages on `DefaultGroup.DefaultSlot` (full-body). Unblocks per-weapon upper-body reload authoring — e.g. ALS "Arm L"/"Arm R" + "Layering Override Group" reloads, per gun, from a single template. See [asset management → AnimMontage from template](asset-management.md#animmontage-from-template). |
 | **1.7.0** | AnimMontage notify authoring — `AddAnimMontageNotify` (skeleton/named FAnimNotifyEvent at a chosen time + optional notify-state duration; resolves or creates the track; registers the name on the skeleton; idempotent on name+time+track) and `RemoveAnimMontageNotifyByName` (TArray::RemoveAll predicate). UE 5.7 Python's `AnimationLibrary.add_animation_notify_event` needs a UClass — passing None creates a notify literally named "None"; the notifies array is protected for direct write. Unblocks placing "ReloadWeapon" (and friends) at a chosen time on per-weapon montages. See [asset management → AnimMontage notifies](asset-management.md#animmontage-notifies). |
 
-## Future roadmap (v1.8+)
+## Future roadmap (v1.9+)
 
 - Full BT graph node authoring (BTGraph + runtime in lockstep).
 - Decorator / service attachment.
