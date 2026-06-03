@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.602.1331
+version: 26.603.1516
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -225,6 +225,15 @@ See [PIE workflow](../unreal/pie-workflow.md).
 | `anim_montage_create_from_template` | **v1.6+** Create a new UAnimMontage by duplicating a template (preserves slot layout, group, sections, blends, notifies) and replacing the AnimSequence in every segment. Headless authoring of upper-body / additive-slot montages. |
 | `anim_montage_add_notify` | **v1.7+** Add a skeleton/named FAnimNotifyEvent at a chosen time + optional notify-state duration. Resolves or creates the NotifyTrack; registers the name on the skeleton; idempotent on name+time+track. |
 | `anim_montage_remove_notify_by_name` | **v1.7+** Remove every FAnimNotifyEvent on the montage with the given name. Returns count_removed. |
+| `bp_create` / `dataasset_create` / `struct_create` / `enum_create` | pure Python | Create a new BP / DataAsset instance / UserDefinedStruct / UserDefinedEnum asset via the matching Factory. |
+| `bp_variable_set_default` | **v1.8+** | Set the default of an existing BP member variable on the CDO. value_kind: auto / string / object / class / soft_object / soft_class / gameplaytag. |
+| `bp_variables_list` | **v1.8+** | List a Blueprint's member variables with type info. NewVariables is protected in UE 5.7 Python. |
+| `dt_row_get` | **v1.8+** | Read a DataTable row as a flat {field_path: value} JSON map. Inverse of dt_row_set_field. |
+| `dt_export` | pure Python | Export a whole DataTable as JSON or CSV. |
+| `gameplaytag_add` / `add_many` / `remove` / `list` / `refresh` | **v1.8+** | Headless GameplayTag CRUD — write to source .ini AND register in-memory so the tag is usable immediately (no editor restart). |
+| `struct_member_add` / `remove` / `rename` / `members_list` | **v1.8+** | UserDefinedStruct member authoring via FStructureEditorUtils. Same pin_category taxonomy as bp_variable_add_typed. |
+| `enum_entry_add` / `set_display_name` / `remove` | **v1.8+** | UserDefinedEnum entry authoring via FEnumEditorUtils. |
+| `enum_entries_list` | pure Python | List a UserDefinedEnum's entries. |
 
 ## SB_JSON marker protocol
 
