@@ -2,7 +2,7 @@
 id: changelog
 title: Changelog
 status: stable
-version: 26.603.1703
+version: 26.603.1728
 tags: [ changelog ]
 ---
 
@@ -12,7 +12,13 @@ Milestones for SystemBridge as a whole — daemon (`sb.exe`), plugins,
 and the Unreal Companion sub-plugin. Individual companion versions are
 also captured in [companion plugin reference](unreal/companion.md).
 
-## Recent: Companion v1.9.x — Control Rig (RigVM) authoring
+## Recent: Companion v1.10.x — Control Rig rig-variable authoring
+
+| Date | Tag | What |
+|---|---|---|
+| 2026-Q2 | **Companion v1.10.0** | Rig-variable authoring — completes the AnimBP-facing dynamic-input contract v1.9 left as static-defaults-only. `ControlRigVariableAdd` (FBlueprintEditorUtils::AddMemberVariable + direction-derived CPF flags; public variables become input pins on the AnimGraph Control Rig node), `ControlRigVariablesList` (name / cpp_type / cpp_type_object / direction / default — direction recovered from a `RigVar|Input/Output/Hidden` category tag), `ControlRigVariableRemove` (idempotent), `ControlRigVariableGetNodeAdd` + `SetNodeAdd` (`URigVMController::AddVariableNode` with CPPType + CPPTypeObject derived from the existing BP variable description). 5 MCP tools. Pure-C++ `BPTypeToRigVMType` maps PC_* + sub-object into RigVM's `FVector` / `int32` / `TArray<FTransform>` etc. format. See [control rig authoring → rig variables](unreal/control-rig-authoring.md#rig-variables-v110). |
+
+## Companion v1.9.x — Control Rig (RigVM) authoring
 
 | Date | Tag | What |
 |---|---|---|

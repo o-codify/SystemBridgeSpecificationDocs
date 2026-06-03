@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.603.1703
+version: 26.603.1728
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -247,6 +247,10 @@ See [PIE workflow](../unreal/pie-workflow.md).
 | `control_rig_pin_set_default` | **v1.9+** | Set a pin default. `pin_path` is dot-notation (`Item.Type`, `Translation.X`); value uses RigVM's text serializer. |
 | `control_rig_add_link` | **v1.9+** | Add an exec/data link between two pins (`PinName` or `Pin.SubPin`). |
 | `control_rig_compile` | **v1.9+** | RecompileVM + save. |
+| `control_rig_variable_add` | **v1.10+** | Add a rig member variable. Public (direction=input/output) variables become input pins on the AnimGraph Control Rig node. Mirrors `bp_variable_add_typed` taxonomy. |
+| `control_rig_variables_list` | **v1.10+** | List rig member variables (name / cpp_type / cpp_type_object / direction / default_value). |
+| `control_rig_variable_remove` | **v1.10+** | Remove a rig variable by name. Idempotent. |
+| `control_rig_variable_get_node_add` / `set_node_add` | **v1.10+** | Add a Get/Set variable node to a rig graph; reads CPPType + CPPTypeObject from the variable definition. |
 
 ## SB_JSON marker protocol
 
