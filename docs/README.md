@@ -2,7 +2,7 @@
 id: systembridge-overview
 title: SystemBridge — Overview
 status: stable
-version: 26.602.1331
+version: 26.603.1514
 tags: [ overview, index ]
 ---
 
@@ -104,6 +104,15 @@ Three loosely-coupled goals:
   a montage." →
   [asset management → AnimMontage notifies](unreal/asset-management.md#animmontage-notifies)
   → `anim_montage_add_notify`.
+- "Build a project-authored DataTable from scratch (struct + rows)." →
+  [data authoring](unreal/data-authoring.md) → `struct_create` +
+  `struct_member_add` + `dt_row_add` + `dt_row_set_field`.
+- "Add 50 GameplayTags without the editor restart cycle." →
+  [data authoring → GameplayTags](unreal/data-authoring.md#gameplaytags)
+  → `gameplaytag_add_many`.
+- "Create a new Blueprint subclass or DataAsset instance." →
+  [data authoring → asset creation](unreal/data-authoring.md#asset-creation)
+  → `bp_create` / `dataasset_create`.
 
 ## Repository
 
