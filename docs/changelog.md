@@ -2,7 +2,7 @@
 id: changelog
 title: Changelog
 status: stable
-version: 26.602.1331
+version: 26.603.1514
 tags: [ changelog ]
 ---
 
@@ -12,7 +12,13 @@ Milestones for SystemBridge as a whole — daemon (`sb.exe`), plugins,
 and the Unreal Companion sub-plugin. Individual companion versions are
 also captured in [companion plugin reference](unreal/companion.md).
 
-## Recent: Companion v1.7.x — AnimMontage notify authoring
+## Recent: Companion v1.8.x — headless data authoring
+
+| Date | Tag | What |
+|---|---|---|
+| 2026-Q2 | **Companion v1.8.0** | Headless data authoring — three coalesced requests closed. **BP/DT**: `SetBlueprintVariableDefault` (typed CDO write — object / class / soft_object / soft_class / gameplaytag / auto), `GetBlueprintVariables` (NewVariables is protected), `GetDataTableRowFieldsJson` (flat dotted-path map). **GameplayTags**: `GameplayTagAdd / Remove / List / Refresh` via `IGameplayTagsEditorModule` + `EditorRefreshGameplayTagTree` — no editor restart per tag addition. **UserDefinedStruct / UserDefinedEnum**: `StructMember*` via `FStructureEditorUtils`, `EnumEntry*` via `FEnumEditorUtils` — closes the DataTable-from-scratch flow. 21 new MCP tools, 11 of which are pure Python (asset creation + dt_export + enum_entries_list). See [data authoring](unreal/data-authoring.md). |
+
+## Companion v1.7.x — AnimMontage notify authoring
 
 | Date | Tag | What |
 |---|---|---|
