@@ -2,7 +2,7 @@
 id: systembridgecompanion-plugin
 title: SystemBridgeCompanion Plugin
 status: stable
-version: 26.603.1516
+version: 26.603.1703
 tags: [ unreal, companion, cpp ]
 ---
 
@@ -69,7 +69,7 @@ build will hit "file in use" on the DLL link step).
 v1.3.1+ adds a permanent widget on the LevelEditor's status bar:
 
 ```
-[● green dot] SB v1.8.0
+[● green dot] SB v1.9.0
 ```
 
 Tooltip lists what's armed and the repo URL. Hover-to-confirm replaces
@@ -101,9 +101,11 @@ having to call `companion_status`.
 | **1.6.0** | AnimMontage slot-track authoring — `CreateAnimMontageFromTemplate` duplicates a template montage (preserving its slot layout, group name, sections, blends, notifies) and swaps the AnimSequence inside every segment for a new clip. UE 5.7 Python can't author `UAnimMontage::SlotAnimTracks` at all (unbound TArray) and `AnimMontageFactory` always lands new montages on `DefaultGroup.DefaultSlot` (full-body). Unblocks per-weapon upper-body reload authoring — e.g. ALS "Arm L"/"Arm R" + "Layering Override Group" reloads, per gun, from a single template. See [asset management → AnimMontage from template](asset-management.md#animmontage-from-template). |
 | **1.7.0** | AnimMontage notify authoring — `AddAnimMontageNotify` (skeleton/named FAnimNotifyEvent at a chosen time + optional notify-state duration; resolves or creates the track; registers the name on the skeleton; idempotent on name+time+track) and `RemoveAnimMontageNotifyByName` (TArray::RemoveAll predicate). UE 5.7 Python's `AnimationLibrary.add_animation_notify_event` needs a UClass — passing None creates a notify literally named "None"; the notifies array is protected for direct write. Unblocks placing "ReloadWeapon" (and friends) at a chosen time on per-weapon montages. See [asset management → AnimMontage notifies](asset-management.md#animmontage-notifies). |
 | **1.8.0** | Headless data authoring — three coalesced gaps. **BP/DT**: `SetBlueprintVariableDefault` (typed CDO write with kind dispatch: object / class / soft_object / soft_class / gameplaytag / auto), `GetBlueprintVariables` (NewVariables is protected in Python), `GetDataTableRowFieldsJson` (flat dotted-path map, inverse of dt_row_set_field). **GameplayTags**: `GameplayTagAdd / Remove / List / Refresh` via `IGameplayTagsEditorModule` + `EditorRefreshGameplayTagTree` — no more editor restart per tag addition. **UserDefinedStruct / UserDefinedEnum**: `StructMemberAdd / Remove / Rename / MembersList` via `FStructureEditorUtils`, `EnumEntryAdd / SetDisplayName / Remove` via `FEnumEditorUtils`. Closes the DataTable-from-scratch flow. Pure-Python helpers ship the asset creation half (`bp_create`, `dataasset_create`, `struct_create`, `enum_create`, `dt_export`, `enum_entries_list`). See [data authoring](data-authoring.md). |
+| **1.9.0** | Control Rig (RigVM) authoring — `ControlRigGraphsList` (main RigGraph; function library deferred to v1.10), `ControlRigNodesList` (name / title / RigUnit struct / position / pin count), `ControlRigAddUnitNode` (FRigUnit-derived `UScriptStruct` → new node name), `ControlRigRemoveNode` (idempotent), `ControlRigPinSetDefault` (dot-notation pin path + RigVM text serializer), `ControlRigAddLink` (exec/data link, "Pin.SubPin" paths), `ControlRigCompile` (`RecompileVM` + `MarkBlueprintAsModified`). All wrap `URigVMController` (RigVMDeveloper) and `UControlRigBlueprint` (ControlRigDeveloper, post-Modular-Rig `*Legacy.h` headers). Asset creation rides on pure-Python `ControlRigBlueprintFactory`. UE 5.7 Python doesn't bind `URigVMController` at all. See [control rig authoring](control-rig-authoring.md). |
 
-## Future roadmap (v1.9+)
+## Future roadmap (v1.10+)
 
+- Control Rig function library — graph enumeration + `AddFunctionToLibrary` + variable CRUD.
 - Full BT graph node authoring (BTGraph + runtime in lockstep).
 - Decorator / service attachment.
 - AnimBP state machines.
