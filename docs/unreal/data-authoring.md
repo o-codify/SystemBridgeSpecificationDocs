@@ -1,8 +1,8 @@
 ---
 id: data-authoring-headless
 title: Data Authoring (headless)
-status: review
-version: 26.603.1514
+status: stable
+version: 26.603.1516
 tags: [ unreal, data, datatable, gameplaytags, userdefined-struct, userdefined-enum ]
 ---
 
