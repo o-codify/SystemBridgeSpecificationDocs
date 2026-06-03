@@ -2,7 +2,7 @@
 id: systembridge-overview
 title: SystemBridge — Overview
 status: stable
-version: 26.603.1728
+version: 26.603.2027
 tags: [ overview, index ]
 ---
 
@@ -113,6 +113,12 @@ Three loosely-coupled goals:
 - "Create a new Blueprint subclass or DataAsset instance." →
   [data authoring → asset creation](unreal/data-authoring.md#asset-creation)
   → `bp_create` / `dataasset_create`.
+- "Place an AnimGraph node — e.g. a Control Rig consumer — in an AnimBP and wire it." →
+  [animgraph authoring](unreal/animgraph-authoring.md)
+  → `anim_node_add` + `anim_node_set_inner_property` + `anim_node_expose_pin` + `bp_node_link_pins`.
+- "Read a mesh socket / bone / actor world transform headlessly." →
+  [transform query](unreal/transform-query.md)
+  → `mesh_sockets_list` / `skeleton_bone_transform` / `actor_transform_query`.
 - "Stand up a Control Rig solver headlessly — add a Two Bone IK unit and wire it." →
   [control rig authoring](unreal/control-rig-authoring.md)
   → `control_rig_create` + `control_rig_node_add` + `control_rig_add_link` + `control_rig_compile`.

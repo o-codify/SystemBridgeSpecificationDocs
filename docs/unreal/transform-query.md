@@ -1,70 +1,127 @@
 ---
-id: transform-query-sockets-bones-components
-title: Transform Query (sockets, bones, components)
-status: request
-version: 26.603.1942
-tags: []
+id: transform-query-sockets-bones-actors
+title: Transform Query (sockets, bones, actors)
+status: stable
+version: 26.603.2027
+tags: [ unreal, transforms, sockets, bones, queries, pure-python ]
 ---
 
-# Transform Query (sockets, bones, components)
+# Transform Query (sockets, bones, actors)
 
-> Status: **requested** (not yet implemented). Proposed by AI while implementing
-> procedural weapon interaction; the underlying need is UE-generic.
+Read transforms out of Unreal — socket definitions on a mesh asset,
+reference-pose bone transforms, and live actor/component/bone/socket
+world transforms during PIE.
 
-## Problem
+All pure-Python: no companion required.
 
-There is currently no SystemBridge tool to **read transforms** out of Unreal.
-`unreal_asset_describe` exposes top-level UObject properties but **not**:
+## When to reach for this
 
-- a SkeletalMesh / StaticMesh asset's **socket** definitions and their local
-  transforms (name, parent bone, relative location/rotation/scale),
-- a Skeleton / SkeletalMesh **reference-pose bone** transform (bone-space or
-  component-space),
-- a live **component / bone / socket world transform** during PIE.
+Foundational read primitive for anything spatial:
 
-This blocks any headless work that must reason about spatial relationships:
-placing IK targets on a mesh, deriving grip/attach offsets, aligning effects to
-sockets, validating that a procedural pose matches an authored one, etc. The
-only workarounds are `unreal_run_python` (an escape hatch we want to avoid) or a
-manual round-trip through the editor UI.
+- Place IK targets relative to a weapon mesh's `GripSocket`.
+- Derive grip / attach offsets from the character mesh's `hand_l`
+  reference-pose transform.
+- Verify a procedurally-driven pose matches an authored one.
+- Align effects to sockets without round-tripping through Blueprint
+  variables.
 
-## Requested capability (UE-generic)
+Without this you'd run a `unreal_run_python` escape hatch or hand-author
+constants. With it, tools can read socket / bone transforms directly
+and bake correct values.
 
-Read-only transform queries. Two layers:
+## Tool surface
 
-### 1. Static (editor, no PIE) — from assets
+### Static (asset-time, no PIE)
 
-- `unreal_mesh_sockets_list` — for a SkeletalMesh or StaticMesh asset, return
-  each socket: `name`, `parent_bone`, `relative_location`, `relative_rotation`,
-  `relative_scale`. Optionally also resolve a socket's **component-space**
-  transform against the reference pose.
-- `unreal_skeleton_bone_transform` — for a Skeleton/SkeletalMesh, return a
-  named bone's reference-pose transform in `bone` and/or `component` space; and
-  list bones with parent indices.
+| Tool | Purpose |
+| ---- | ------- |
+| `mesh_sockets_list` | List sockets on a SkeletalMesh or StaticMesh. Each entry: name, parent_bone, relative location/rotation/scale. |
+| `mesh_socket_transform` | A SkeletalMesh socket's relative transform PLUS its parent bone's component-space transform. Static ref-pose, no PIE. |
+| `skeleton_bones_list` | Bones on a Skeleton (accepts Skeleton OR SkeletalMesh path). index, name, parent_index, parent_name. |
+| `skeleton_bone_transform` | A bone's reference-pose transform in `"bone"` (local) or `"component"` space. |
 
-### 2. Live (during PIE) — from spawned actors/components
+### Live (PIE / level)
 
-- `unreal_actor_transform_query` — given a level/PIE actor (and optionally a
-  component name, bone name, or socket name), return the resolved **world**
-  transform (and optionally relative-to-parent). Should also support resolving
-  one transform **relative to another** (e.g. socket-of-A relative to
-  component-of-B) so callers can derive offsets without doing matrix math by
-  hand.
+| Tool | Purpose |
+| ---- | ------- |
+| `actor_transform_query` | Live world transform for an actor by display label. Optional `component_name` / `bone_name` / `socket_name` resolve a deeper transform. `relative_to` returns target relative to a reference. |
 
-All outputs as `{location:[x,y,z], rotation:[pitch,yaw,roll], scale:[x,y,z]}`
-(or quaternion variant), matching how other `unreal_*` tools return structs.
+## Output shape
 
-## Why generic, not project-specific
+All transforms are returned as:
 
-Every Unreal project that does IK, attachment, VFX alignment, weapon/tool
-handling, or procedural animation needs to know where sockets and bones are in
-space. This is a foundational read primitive, not a feature of any one game.
+```jsonc
+{
+  "location": [x, y, z],
+  "rotation": [pitch, yaw, roll],
+  "scale":    [x, y, z]
+}
+```
 
-## Concrete motivating case
+— `FRotator` form for rotation (degrees, pitch/yaw/roll), matching the
+rest of the `unreal_*` tool surface.
 
-Procedural weapon hold: to author or verify grip offsets (hand-relative-to-
-weapon, weapon-relative-to-body) we must read the weapon mesh's `GripSocket`
-local transform and the character's `hand_l/hand_r/spine_03` transforms. Today
-this can only be done at runtime inside a Blueprint, forcing a fully
-runtime-computed design even when static authoring would be simpler. A static
-socket/bone read would let tools bake correct values directly into a profile.
+## Examples
+
+### Read a weapon's grip socket
+
+```python
+unreal_mesh_sockets_list(asset_path="/Game/Weapons/SM_Pistol")
+# → {sockets: [{name: "GripSocket", parent_bone: "", relative_location: [0, 0, 10], ...}]}
+
+unreal_mesh_socket_transform(
+    asset_path="/Game/Characters/SK_Mannequin",
+    socket_name="hand_l_socket",
+)
+# → relative + parent_bone_component_space
+```
+
+### Bake grip offset between weapon-grip and hand-bone
+
+```python
+hand = unreal_skeleton_bone_transform(
+    asset_path="/Game/Characters/SK_Mannequin", bone_name="hand_l",
+    space="component",
+)["component"]
+grip = unreal_mesh_socket_transform(
+    asset_path="/Game/Weapons/SM_Pistol", socket_name="GripSocket",
+)
+# Compose grip relative to hand offline; bake into a DataAsset.
+```
+
+### Live: weapon-socket world transform relative to camera
+
+```python
+unreal_actor_transform_query(
+    actor_label="BP_Hero_C_0",
+    component_name="WeaponMesh",
+    socket_name="MuzzleSocket",
+    relative_to={"actor_label": "BP_Hero_C_0",
+                 "component_name": "Camera"},
+)
+# → {world: {...}, relative: {...}}
+```
+
+## Caveats
+
+- **5.7 ReferenceSkeleton binding is partial.** `skeleton_bone_transform`
+  is best-effort: when the Python binding for `FReferenceSkeleton` is
+  unavailable on the loaded UE build, the tool returns
+  `bone_not_found_or_unsupported_api`. Fall back to
+  `actor_transform_query` on a PIE actor that uses the skeleton.
+- **`actor_transform_query` requires an active editor world.** Outside
+  PIE it returns the editor-level world transform of the actor in the
+  current level.
+- **Actor lookup is by display label.** Use `unreal_level_actor_list` to
+  discover labels. Two actors sharing a label is unsupported — the first
+  match wins.
+
+## Cross-references
+
+- [companion plugin](companion.md) — v1.11.0 entry (this page ships
+  alongside the AnimGraph release).
+- [animgraph authoring](animgraph-authoring.md) — pairs naturally:
+  read a socket location with `mesh_socket_transform`, drive a Control
+  Rig effector pin with the result.
+- [asset management](asset-management.md) — the broader read-side
+  introspection surface.

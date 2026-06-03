@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.603.1728
+version: 26.603.2027
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -251,6 +251,28 @@ See [PIE workflow](../unreal/pie-workflow.md).
 | `control_rig_variables_list` | **v1.10+** | List rig member variables (name / cpp_type / cpp_type_object / direction / default_value). |
 | `control_rig_variable_remove` | **v1.10+** | Remove a rig variable by name. Idempotent. |
 | `control_rig_variable_get_node_add` / `set_node_add` | **v1.10+** | Add a Get/Set variable node to a rig graph; reads CPPType + CPPTypeObject from the variable definition. |
+
+### AnimGraph (v1.11)
+
+| Tool | Companion | Purpose |
+|---|---|---|
+| `anim_node_add` | **v1.11+** | Add a `UAnimGraphNode_*` subclass by class path. Returns `node_guid`. |
+| `anim_node_set_inner_property` | **v1.11+** | Write a UPROPERTY on the inner `FAnimNode_*` runtime struct; node reconstructs so class-driven pin sets update. |
+| `anim_node_expose_pin` | **v1.11+** | Toggle entries in `ShowPinForProperties` + reconstruct. |
+| `anim_node_info` | **v1.11+** | Read class, inner struct, position, pins, exposed-pin properties. |
+| `anim_node_remove` | **v1.11+** | Remove by guid (routes through `bp_node_remove` — gets the v1.10.2 variable-snapshot guard). |
+
+Linking pose AND data pins reuses `bp_node_link_pins` / `bp_node_break_link` / `bp_node_pin_links`.
+
+### Transforms (sockets, bones, actors)
+
+| Tool | Companion | Purpose |
+|---|---|---|
+| `mesh_sockets_list` | pure Python | Sockets on SkeletalMesh / StaticMesh (name, parent_bone, relative xform). |
+| `mesh_socket_transform` | pure Python | A SkeletalMesh socket's relative xform + parent bone in component space. |
+| `skeleton_bones_list` | pure Python | Bones with parent_index / parent_name. |
+| `skeleton_bone_transform` | pure Python | A bone's reference-pose transform in `bone` or `component` space. |
+| `actor_transform_query` | pure Python | Live world transform; optional component / bone / socket / relative_to. |
 
 ## SB_JSON marker protocol
 

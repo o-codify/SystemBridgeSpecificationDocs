@@ -1,77 +1,183 @@
 ---
-id: animgraph-authoring-anim-nodes-control-rig-pose-links
-title: AnimGraph Authoring (anim nodes, Control Rig, pose links)
-status: request
-version: 26.603.1941
-tags: []
+id: animgraph-authoring-headless
+title: AnimGraph Authoring (headless)
+status: stable
+version: 26.603.2027
+tags: [ unreal, animgraph, anim-blueprint, control-rig, authoring, companion ]
 ---
 
-# AnimGraph Authoring (anim nodes, Control Rig, pose links)
+# AnimGraph Authoring (headless)
 
-> Status: **requested** (not yet implemented). Proposed by AI while wiring a
-> procedural weapon-hold Control Rig into an existing AnimBP. UE-generic.
+SystemBridgeCompanion v1.11.0+ exposes AnimGraph authoring so an AI
+agent can place and wire AnimGraph nodes — including the `Control Rig`
+node that feeds the rig built via [control rig authoring](control-rig-authoring.md) —
+without opening the AnimBP editor.
 
-## Problem
+Previously the only authoring surface was K2 graphs. v1.11 mirrors the
+existing `bp_node_*` tools for AnimGraphs.
 
-SystemBridge can author regular Blueprint graphs (`unreal_bp_node_create`,
-`unreal_bp_node_link_pins`, `unreal_bp_node_call_function_target`, etc.) but
-has **no equivalent for AnimGraphs**. The existing anim tools are read/limited:
+## Tool surface
 
-- `unreal_anim_blueprint_graphs` — lists graphs (names only).
-- `unreal_anim_blueprint_nodes` — lists anim nodes (class + name only; **no
-  pins, no links, no properties**).
-- `unreal_anim_blueprint_set_node_asset_override` — swaps a sequence asset.
+| Tool | Purpose |
+| ---- | ------- |
+| `anim_node_add` | Instantiate any `UAnimGraphNode_*` subclass by class path. Returns `node_guid`. |
+| `anim_node_set_inner_property` | Write a UPROPERTY on the inner `FAnimNode_*` runtime struct. Reconstructs the node so class-driven pin sets update. |
+| `anim_node_expose_pin` | Toggle "expose as pin" for an inner property; reconstructs. |
+| `anim_node_info` | Read node_class, inner_struct, position, pins (with `linked_count` and types), exposed pin properties. |
+| `anim_node_remove` | Remove by guid. Routes through `bp_node_remove` (gets the v1.10.2 variable-snapshot guard). |
 
-There is **no way** to:
+Pose AND data wiring reuse `bp_node_link_pins` / `bp_node_break_link` /
+`bp_node_pin_links` — `UAnimGraphNode_*` IS a `UEdGraphNode`, so the
+K2 link/inspect tools work identically.
 
-- add an AnimGraph node (e.g. `AnimGraphNode_ControlRig`,
-  `AnimGraphNode_TwoBoneIK`, `AnimGraphNode_ModifyBone`, `LayeredBoneBlend`),
-- wire **pose links** (FPoseLink) between anim nodes,
-- set an anim node's properties (e.g. a Control Rig node's `ControlRigClass`,
-  alpha, bone names, blend weights),
-- expose an anim node's inner properties **as pins** and drive them from
-  AnimBP variables / property access (the standard way to feed per-frame data
-  such as IK targets into a Control Rig node),
-- read an anim node's pins/links/properties for verification.
+## Common node class paths
 
-This blocks the canonical Unreal procedural-animation workflow: feed a Control
-Rig node in the AnimGraph from an AnimBP-facing data contract. We built the
-Control Rig (`unreal_control_rig_*` works headless) and the feeding component,
-but cannot place/wire the Control Rig node into the AnimGraph.
+| `node_class_path` | Inner `FAnimNode_*` struct |
+| ----------------- | -------------------------- |
+| `/Script/AnimGraph.AnimGraphNode_ControlRig` | `AnimNode_ControlRig_ExternalSource` |
+| `/Script/AnimGraph.AnimGraphNode_TwoBoneIK` | `AnimNode_TwoBoneIK` |
+| `/Script/AnimGraph.AnimGraphNode_ModifyBone` | `AnimNode_ModifyBone` |
+| `/Script/AnimGraph.AnimGraphNode_LayeredBoneBlend` | `AnimNode_LayeredBoneBlend` |
+| `/Script/AnimGraph.AnimGraphNode_SequencePlayer` | `AnimNode_SequencePlayer` |
+| `/Script/AnimGraph.AnimGraphNode_BlendSpaceGraph` | `AnimNode_BlendSpaceGraph` |
 
-## Requested capability (UE-generic)
+Inner-property names live on the FAnimNode_* struct. Read them with
+`anim_node_info`'s `inner_struct` field, then look up the struct in the
+engine source or via `unreal.SystemBridgeBindings.struct_members_list` —
+the same names you'd see in the editor's Details panel apply.
 
-Mirror the regular-BP node tools for AnimGraphs:
+## Quick start — wire a Control Rig node into an AnimBP
 
-- `unreal_anim_node_add` — add an anim node of a given class to a named anim
-  graph; return guid + pins.
-- `unreal_anim_node_set_property` — set a UPROPERTY on the anim node's inner
-  `FAnimNode_*` struct (e.g. `ControlRigClass`, `LocationSpace`, `BoneToModify`,
-  `Alpha`, blend weights).
-- `unreal_anim_node_expose_pin` — toggle "expose as pin" for an inner property
-  (so it can be driven), and `unreal_anim_node_link_pins` — wire both **pose**
-  pins and **data** pins (including from property-access / variable-get nodes).
-- `unreal_anim_node_pins` — read an anim node's pins/links/exposed properties
-  (the missing read side; current `unreal_anim_blueprint_nodes` returns only
-  class+name).
-- For Control Rig nodes specifically: after `ControlRigClass` is set, the node
-  must reconstruct so the rig's exposed input/output variables appear as pins
-  (same as the editor does), so callers can drive them.
+Continues the [control rig authoring](control-rig-authoring.md) quick
+start. The rig is built; now place its consumer in the AnimBP.
 
-Outputs should match the regular-BP node tools' shape (guid, pins with
-name/category/direction/links).
+```python
+ABP = "/Game/Characters/ABP_Hero"
 
-## Why generic, not project-specific
+# 1. Add a Control Rig node into the main AnimGraph.
+add = unreal_anim_node_add(
+    blueprint=ABP, graph_name="AnimGraph",
+    node_class_path="/Script/AnimGraph.AnimGraphNode_ControlRig",
+    x=400, y=0,
+)
+cr_node = add["node_guid"]
 
-Control Rig nodes, Two Bone IK, Modify Bone, Layered Bone Blend, slots, and
-pose wiring are core to **every** Unreal animation project. Headless AnimGraph
-authoring is the missing half of the existing headless Blueprint authoring.
+# 2. Point it at the rig built earlier.
+unreal_anim_node_set_inner_property(
+    blueprint=ABP, graph_name="AnimGraph", node_guid=cr_node,
+    property_path="ControlRigClass",
+    value="/Game/Rigs/CR_Hero.CR_Hero_C",
+)
+# Reconstruct auto-fires; the rig's input variables now appear as pins.
 
-## Concrete motivating case
+# 3. Expose the rig's public input variable as a pin.
+unreal_anim_node_expose_pin(
+    blueprint=ABP, graph_name="AnimGraph", node_guid=cr_node,
+    property_name="LeftHandTargetWorld", expose=True,
+)
 
-Procedural weapon hold: a feeding `ActorComponent` computes both hands' world
-targets + elbow poles each frame; a Control Rig (`CR_WeaponHold`, Two Bone IK
-per arm) solves them. The only missing step is placing an
-`AnimGraphNode_ControlRig(CR_WeaponHold)` into the character AnimGraph, driving
-its exposed `LeftHandTargetWorld/RightHandTargetWorld/...` input pins from the
-component, and wiring its pose in/out — none of which current tools can do.
+# 4. Wire the AnimBP's Output Pose to consume the rig's pose output.
+nodes = unreal_anim_blueprint_nodes(blueprint=ABP, graph_name="AnimGraph")
+out = next(n for n in nodes
+           if "AnimGraphNode_Root" in n["node_class"])["node_guid"]
+
+unreal_bp_node_link_pins(
+    bp_path=ABP, graph_name="AnimGraph",
+    src_node_guid=cr_node, src_pin="Pose",
+    dst_node_guid=out,     dst_pin="Result",
+)
+
+# 5. Feed LeftHandTargetWorld from an AnimBP variable.
+# (variable already exists; create a Get-variable node and link it.)
+get = unreal_bp_node_create(
+    bp_path=ABP, graph_name="AnimGraph",
+    node_class="/Script/BlueprintGraph.K2Node_VariableGet", x=0, y=0,
+)
+unreal_bp_node_variable_target(
+    bp_path=ABP, graph_name="AnimGraph",
+    node_guid=get["node_guid"], variable_name="LeftHandTargetWorld",
+)
+unreal_bp_node_link_pins(
+    bp_path=ABP, graph_name="AnimGraph",
+    src_node_guid=get["node_guid"], src_pin="LeftHandTargetWorld",
+    dst_node_guid=cr_node,          dst_pin="LeftHandTargetWorld",
+)
+
+unreal_bp_compile_and_save(bp_path=ABP)
+```
+
+The AnimGraph now runs the rig and drives its hand-target input from an
+AnimBP variable updated each frame.
+
+## Inner-property semantics
+
+`anim_node_set_inner_property` writes via
+`FProperty::ImportText_InContainer` after walking the dot-notation path
+from the inner FAnimNode_* struct. For most primitive types the value is
+the obvious text form:
+
+| Type | Example value |
+| ---- | ------------- |
+| `float` / `double` | `0.85` |
+| `bool` | `True` / `False` |
+| `FName` | `Hand_L` (bare) |
+| `FVector` | `(X=1.0,Y=0.0,Z=0.0)` |
+| `FRotator` | `(Pitch=0,Yaw=90,Roll=0)` |
+| `FBoneReference` | `(BoneName="hand_l")` |
+| Object / class | asset/class path (e.g. `/Game/Rigs/CR_Hero.CR_Hero_C`) |
+
+For object and class leaves the tool detects an asset path and loads it
+via `StaticLoadObject` / `StaticLoadClass` before assignment — mirrors
+`bp_node_pin_set_object` ergonomics.
+
+## "Expose as pin" semantics
+
+AnimGraph nodes embed their input properties as inner-struct UPROPERTYs;
+which of those surface as input pins is controlled by
+`UAnimGraphNode_Base::ShowPinForProperties` — a `TArray<FOptionalPinFromProperty>`
+where each entry's `bShowPin` says whether that property has a pin.
+
+`anim_node_expose_pin` toggles the matching entry and reconstructs the
+node so the pin set updates. Properties not in `ShowPinForProperties`
+(non-optional pins, or properties the node doesn't expose at all) return
+`success: false` — there's no underlying mechanism to create a pin for
+them.
+
+After `ControlRigClass` is set, the rig's public variables get added to
+`ShowPinForProperties` as a side-effect of the reconstruct; from then on
+`anim_node_expose_pin(property_name="<rig var>")` works for every public
+rig variable.
+
+## Reading state
+
+`anim_node_info` returns the same `FSBPinInfo` shape the K2 tools use —
+`name`, `direction`, `pin_category` / `pin_sub_category` /
+`pin_sub_category_object`, `linked_count`, `default_value`. Use it before
+linking to discover the right pin names, and after editing to verify the
+pin set.
+
+For per-pin links (the OTHER side of every connection), call
+`bp_node_pin_links` — same tool, works on AnimGraph nodes.
+
+## Caveats
+
+- **Anim Class Defaults pins** (per-property "Anim Class Defaults" tab
+  inputs) are a different surface from `ShowPinForProperties`. v1.11
+  covers the latter only.
+- **State machines** (`UAnimStateMachineGraph`, transitions) are not yet
+  in scope — `anim_node_add` works on the main AnimGraph and on any
+  AnimGraph schema sub-graph it can find by name, but state-machine
+  state authoring is deferred.
+- **Custom AnimGraph node classes** from project modules work via their
+  path (e.g. `/Script/MyGame.AnimGraphNode_Custom`) provided the class
+  derives from `UAnimGraphNode_Base` and is loaded.
+
+## Cross-references
+
+- [companion plugin](companion.md) — v1.11.0 entry.
+- [control rig authoring](control-rig-authoring.md) — builds the rig
+  this page consumes.
+- [blueprint authoring](blueprint-authoring.md) — the K2 graph
+  authoring tools whose surface this page parallels.
+- [transform query](transform-query.md) — read sockets / bones /
+  actor transforms (useful for verifying IK targets).

@@ -12,11 +12,18 @@ Milestones for SystemBridge as a whole — daemon (`sb.exe`), plugins,
 and the Unreal Companion sub-plugin. Individual companion versions are
 also captured in [companion plugin reference](unreal/companion.md).
 
-## Recent: Companion v1.10.x — Control Rig rig-variable authoring
+## Recent: Companion v1.11.x — AnimGraph authoring + transform queries
 
 | Date | Tag | What |
 |---|---|---|
-| 2026-Q2 | **Companion v1.10.2** | Bug fix for `bp_node_remove`. UE's `Graph->RemoveNode` broadcasts `OnGraphChanged` which triggers a compile-on-modify cleanup that swept "unreferenced" member variables — a destructive surprise when the user declared variables in advance of wiring them. Fix: snapshot `Blueprint->NewVariables` before the remove, restore any that disappear. Restore-only (never invents vars); logs a warning when a restore fires. |
+| 2026-Q2 | **Companion v1.11.0** | AnimGraph authoring — 5 tools mirroring the `bp_node_*` surface for `UAnimGraphNode_*` (ControlRig / TwoBoneIK / ModifyBone / LayeredBoneBlend / SequencePlayer / …). `anim_node_add` instantiates a node by class path; `anim_node_set_inner_property` writes UPROPERTYs on the inner `FAnimNode_*` runtime struct via `FProperty::ImportText_InContainer` (dot-notation, object/class leaves accept asset paths, reconstruct fires so class-driven pin sets update); `anim_node_expose_pin` toggles `ShowPinForProperties`; `anim_node_info` gives read parity; `anim_node_remove` routes through `bp_node_remove`. Linking reuses existing K2 link tools — AnimGraph nodes ARE UEdGraphNodes. Build.cs picks up `AnimGraph` + `AnimGraphRuntime`. Closes the AnimGraph half of headless authoring. See [animgraph authoring](unreal/animgraph-authoring.md). |
+| 2026-Q2 | sb-unreal | 5 transform-query tools — the missing read-side primitive for IK / attachment / VFX alignment. `mesh_sockets_list`, `skeleton_bones_list`, `skeleton_bone_transform`, `mesh_socket_transform`, `actor_transform_query` (with optional `relative_to`). All pure Python — no companion required. See [transform query](unreal/transform-query.md). |
+| 2026-Q2 | sb-unreal | `expectedCompanionVersion` externalised to a `expected_companion_version.txt` sidecar next to the binary. Bumping the expected companion version no longer requires rebuilding `sb-unreal.exe` — and so no longer requires a Claude Desktop restart, which is what was triggering the "transport closed" cascade users reported. See [mcp transport recovery](mcp-transport-auto-recovery.md). |
+
+## Companion v1.10.x — Control Rig rig-variable authoring
+
+| Date | Tag | What |
+|---|---|---|
 | 2026-Q2 | **Companion v1.10.1** | Bug fix for v1.10.0 rig variables. `URigVMController::AddVariableNode` was leaving broken nodes bound to `@@` because variables were added via `FBlueprintEditorUtils::AddMemberVariable` (BP-only) instead of the canonical `URigVMBlueprint::AddMemberVariable` (BP + RigVM model). Switched to the canonical surface for add / remove / list; CPPType comes from `RigVMTypeUtils::CPPTypeFromPinType`. Get/set node creation sanity-checks the returned binding and rolls back any half-bound node. Closes the v1.10.0 follow-up bug report. |
 | 2026-Q2 | **Companion v1.10.0** | Rig-variable authoring — completes the AnimBP-facing dynamic-input contract v1.9 left as static-defaults-only. `ControlRigVariableAdd` (FBlueprintEditorUtils::AddMemberVariable + direction-derived CPF flags; public variables become input pins on the AnimGraph Control Rig node), `ControlRigVariablesList` (name / cpp_type / cpp_type_object / direction / default — direction recovered from a `RigVar|Input/Output/Hidden` category tag), `ControlRigVariableRemove` (idempotent), `ControlRigVariableGetNodeAdd` + `SetNodeAdd` (`URigVMController::AddVariableNode` with CPPType + CPPTypeObject derived from the existing BP variable description). 5 MCP tools. Pure-C++ `BPTypeToRigVMType` maps PC_* + sub-object into RigVM's `FVector` / `int32` / `TArray<FTransform>` etc. format. See [control rig authoring → rig variables](unreal/control-rig-authoring.md#rig-variables-v110). |
 

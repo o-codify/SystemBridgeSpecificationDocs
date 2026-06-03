@@ -2,7 +2,7 @@
 id: unreal-deep-dive
 title: Unreal — Deep Dive
 status: stable
-version: 26.603.1703
+version: 26.603.2027
 tags: [ unreal, ue, index ]
 ---
 
@@ -32,6 +32,10 @@ For the tool catalog (every UE tool with one-line descriptions), see
   `asset_describe`, references / dependencies.
 - [Control Rig authoring](control-rig-authoring.md) — headless RigVM graph
   authoring via `URigVMController` (v1.9+).
+- [AnimGraph authoring](animgraph-authoring.md) — headless `UAnimGraphNode_*`
+  CRUD: place a Control Rig node, set inner properties, expose pins (v1.11+).
+- [Transform query](transform-query.md) — read sockets / bones / actor world
+  transforms (pure Python).
 - [editor_status reference](#editor_status) (this page).
 
 ## When to use what
