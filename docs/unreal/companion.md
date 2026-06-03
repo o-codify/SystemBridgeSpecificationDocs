@@ -2,7 +2,7 @@
 id: systembridgecompanion-plugin
 title: SystemBridgeCompanion Plugin
 status: stable
-version: 26.603.2027
+version: 26.603.2108
 tags: [ unreal, companion, cpp ]
 ---
 
@@ -69,7 +69,7 @@ build will hit "file in use" on the DLL link step).
 v1.3.1+ adds a permanent widget on the LevelEditor's status bar:
 
 ```
-[● green dot] SB v1.10.1
+[● green dot] SB v1.11.1
 ```
 
 Tooltip lists what's armed and the repo URL. Hover-to-confirm replaces

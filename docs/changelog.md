@@ -2,7 +2,7 @@
 id: changelog
 title: Changelog
 status: stable
-version: 26.603.2027
+version: 26.603.2108
 tags: [ changelog ]
 ---
 
@@ -16,6 +16,7 @@ also captured in [companion plugin reference](unreal/companion.md).
 
 | Date | Tag | What |
 |---|---|---|
+| 2026-Q2 | **Companion v1.11.1** | Two v1.11.0 bug fixes. `anim_node_add` couldn't return the guid for `AnimGraphNode_ControlRig` (and other subclasses that don't expose NodeGuid as a Python attribute) — the node WAS created; only the readback failed. Switched to the companion `get_node_guid` binding. Docstring/example path corrected: Control Rig anim node is `/Script/ControlRigDeveloper.AnimGraphNode_ControlRig`. `anim_node_expose_pin` couldn't toggle Control Rig rig variables because `UAnimGraphNode_CustomProperty` subclasses store bindable-variable pins in `CustomPinProperties`, not `ShowPinForProperties`. Now walks both via `FArrayProperty` reflection. New `anim_node_list_exposable_pins` enumerates both lists with `source` tags so callers can discover the bindable surface. |
 | 2026-Q2 | **Companion v1.11.0** | AnimGraph authoring — 5 tools mirroring the `bp_node_*` surface for `UAnimGraphNode_*` (ControlRig / TwoBoneIK / ModifyBone / LayeredBoneBlend / SequencePlayer / …). `anim_node_add` instantiates a node by class path; `anim_node_set_inner_property` writes UPROPERTYs on the inner `FAnimNode_*` runtime struct via `FProperty::ImportText_InContainer` (dot-notation, object/class leaves accept asset paths, reconstruct fires so class-driven pin sets update); `anim_node_expose_pin` toggles `ShowPinForProperties`; `anim_node_info` gives read parity; `anim_node_remove` routes through `bp_node_remove`. Linking reuses existing K2 link tools — AnimGraph nodes ARE UEdGraphNodes. Build.cs picks up `AnimGraph` + `AnimGraphRuntime`. Closes the AnimGraph half of headless authoring. See [animgraph authoring](unreal/animgraph-authoring.md). |
 | 2026-Q2 | sb-unreal | 5 transform-query tools — the missing read-side primitive for IK / attachment / VFX alignment. `mesh_sockets_list`, `skeleton_bones_list`, `skeleton_bone_transform`, `mesh_socket_transform`, `actor_transform_query` (with optional `relative_to`). All pure Python — no companion required. See [transform query](unreal/transform-query.md). |
 | 2026-Q2 | sb-unreal | `expectedCompanionVersion` externalised to a `expected_companion_version.txt` sidecar next to the binary. Bumping the expected companion version no longer requires rebuilding `sb-unreal.exe` — and so no longer requires a Claude Desktop restart, which is what was triggering the "transport closed" cascade users reported. See [mcp transport recovery](mcp-transport-auto-recovery.md). |

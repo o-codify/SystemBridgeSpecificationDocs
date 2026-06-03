@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.603.2027
+version: 26.603.2108
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -258,7 +258,8 @@ See [PIE workflow](../unreal/pie-workflow.md).
 |---|---|---|
 | `anim_node_add` | **v1.11+** | Add a `UAnimGraphNode_*` subclass by class path. Returns `node_guid`. |
 | `anim_node_set_inner_property` | **v1.11+** | Write a UPROPERTY on the inner `FAnimNode_*` runtime struct; node reconstructs so class-driven pin sets update. |
-| `anim_node_expose_pin` | **v1.11+** | Toggle entries in `ShowPinForProperties` + reconstruct. |
+| `anim_node_expose_pin` | **v1.11+** | Toggle entries in `ShowPinForProperties` (and `CustomPinProperties` since v1.11.1 — where Control Rig / Linked Anim Layer expose bindable variables). Reconstructs. |
+| `anim_node_list_exposable_pins` | **v1.11.1+** | Enumerate both pin lists with `source` tag (`show` / `custom`) — the discovery surface for `anim_node_expose_pin`. |
 | `anim_node_info` | **v1.11+** | Read class, inner struct, position, pins, exposed-pin properties. |
 | `anim_node_remove` | **v1.11+** | Remove by guid (routes through `bp_node_remove` — gets the v1.10.2 variable-snapshot guard). |
 

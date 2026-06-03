@@ -2,7 +2,7 @@
 id: animgraph-authoring-headless
 title: AnimGraph Authoring (headless)
 status: stable
-version: 26.603.2027
+version: 26.603.2108
 tags: [ unreal, animgraph, anim-blueprint, control-rig, authoring, companion ]
 ---
 
@@ -22,8 +22,9 @@ existing `bp_node_*` tools for AnimGraphs.
 | ---- | ------- |
 | `anim_node_add` | Instantiate any `UAnimGraphNode_*` subclass by class path. Returns `node_guid`. |
 | `anim_node_set_inner_property` | Write a UPROPERTY on the inner `FAnimNode_*` runtime struct. Reconstructs the node so class-driven pin sets update. |
-| `anim_node_expose_pin` | Toggle "expose as pin" for an inner property; reconstructs. |
-| `anim_node_info` | Read node_class, inner_struct, position, pins (with `linked_count` and types), exposed pin properties. |
+| `anim_node_list_exposable_pins` | **v1.11.1** — list every property toggleable into a pin, across `ShowPinForProperties` AND `CustomPinProperties` (Control Rig / Linked Anim Layer use the latter). Each entry: `{source: "show"|"custom", property, exposed}`. |
+| `anim_node_expose_pin` | Toggle "expose as pin". Walks both `ShowPinForProperties` and `CustomPinProperties` (v1.11.1+) — the latter is where Control Rig bindable variables live. Reconstructs. |
+| `anim_node_info` | Read node_class, inner_struct, position, pins (with `linked_count` and types), exposed pin properties (combined Show + Custom). |
 | `anim_node_remove` | Remove by guid. Routes through `bp_node_remove` (gets the v1.10.2 variable-snapshot guard). |
 
 Pose AND data wiring reuse `bp_node_link_pins` / `bp_node_break_link` /
@@ -34,7 +35,7 @@ K2 link/inspect tools work identically.
 
 | `node_class_path` | Inner `FAnimNode_*` struct |
 | ----------------- | -------------------------- |
-| `/Script/AnimGraph.AnimGraphNode_ControlRig` | `AnimNode_ControlRig_ExternalSource` |
+| `/Script/ControlRigDeveloper.AnimGraphNode_ControlRig` | `AnimNode_ControlRig` |
 | `/Script/AnimGraph.AnimGraphNode_TwoBoneIK` | `AnimNode_TwoBoneIK` |
 | `/Script/AnimGraph.AnimGraphNode_ModifyBone` | `AnimNode_ModifyBone` |
 | `/Script/AnimGraph.AnimGraphNode_LayeredBoneBlend` | `AnimNode_LayeredBoneBlend` |
@@ -133,20 +134,31 @@ via `StaticLoadObject` / `StaticLoadClass` before assignment — mirrors
 ## "Expose as pin" semantics
 
 AnimGraph nodes embed their input properties as inner-struct UPROPERTYs;
-which of those surface as input pins is controlled by
-`UAnimGraphNode_Base::ShowPinForProperties` — a `TArray<FOptionalPinFromProperty>`
-where each entry's `bShowPin` says whether that property has a pin.
+which of those surface as input pins is controlled by two TArrays of
+`FOptionalPinFromProperty`:
 
-`anim_node_expose_pin` toggles the matching entry and reconstructs the
-node so the pin set updates. Properties not in `ShowPinForProperties`
-(non-optional pins, or properties the node doesn't expose at all) return
-`success: false` — there's no underlying mechanism to create a pin for
-them.
+- **`ShowPinForProperties`** — on `UAnimGraphNode_Base`. Lists the
+  node's own optional pins (e.g. `Alpha` on most blend nodes).
+- **`CustomPinProperties`** — on `UAnimGraphNode_CustomProperty` (the
+  subclass used by the Control Rig anim node, Linked Anim Layer nodes,
+  etc.). Lists the variables sourced from the *bound class*: a Control
+  Rig's public input/output rig variables, a Linked Anim Layer's
+  inputs, etc.
 
-After `ControlRigClass` is set, the rig's public variables get added to
-`ShowPinForProperties` as a side-effect of the reconstruct; from then on
-`anim_node_expose_pin(property_name="<rig var>")` works for every public
-rig variable.
+`anim_node_expose_pin` (v1.11.1+) tries `ShowPinForProperties` first
+then falls through to `CustomPinProperties`. Properties absent from both
+return `success: false` — there's no underlying mechanism to create a
+pin for them.
+
+When you don't know which list a property lives in (which is the common
+case with Control Rig), call `anim_node_list_exposable_pins` first — it
+returns one entry per toggleable property tagged with `source: "show"`
+or `source: "custom"`.
+
+After `ControlRigClass` is set on a Control Rig anim node, the rig's
+public variables appear in `CustomPinProperties` via reconstruct; from
+then on `anim_node_expose_pin(property_name="<rig var>")` flips the
+show flag and the pin appears.
 
 ## Reading state
 
