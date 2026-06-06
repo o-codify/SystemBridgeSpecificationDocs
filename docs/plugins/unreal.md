@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.603.2108
+version: 26.606.219
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -108,7 +108,7 @@ end-to-end flow.
 |---|---|---|
 | `bp_get_info` | no | Comprehensive structure: generated class, components, CDO sample. |
 | `bp_components_list` | no | SCS components with `var_name` + class. |
-| `bp_set_component_property` | no | Set a property on an SCS-template component (uses SubobjectDataSubsystem). |
+| `bp_set_component_property` | no | Set a property on an SCS-template component (uses SubobjectDataSubsystem). **String-only** — see `bp_set_component_property_typed` (v1.12) for numerics / structs / asset paths. |
 | `bp_compile_and_save` | no | Compile + save. Required after edits. |
 | `bp_variable_add` | no | Add a primitive member variable. Legacy: non-primitive types silently became Int. |
 | `bp_variable_add_typed` | **v1.3.4+** | Add a member variable with FULL type control (object, class, soft_object, soft_class, interface, struct, enum, all primitives, all containers). Optional `default_object` writes the CDO. |
@@ -269,11 +269,39 @@ Linking pose AND data pins reuses `bp_node_link_pins` / `bp_node_break_link` / `
 
 | Tool | Companion | Purpose |
 |---|---|---|
-| `mesh_sockets_list` | pure Python | Sockets on SkeletalMesh / StaticMesh (name, parent_bone, relative xform). |
+| `mesh_sockets_list` | pure Python | Sockets on SkeletalMesh / StaticMesh (name, parent_bone, relative xform). v1.12 switched to the public `num_sockets()` / `get_socket_by_index()` API — v1.11 hit the protected `Sockets` UPROPERTY and dumped a ~270KB traceback. |
 | `mesh_socket_transform` | pure Python | A SkeletalMesh socket's relative xform + parent bone in component space. |
-| `skeleton_bones_list` | pure Python | Bones with parent_index / parent_name. |
+| `mesh_socket_add` | **v1.12+** | Create or update a SkeletalMesh socket headlessly — sets `parent_bone`, which stock UE 5.7 Python can't (`VisibleAnywhere + BlueprintReadOnly`). Idempotent on socket name. Optional `add_to_skeleton`. |
+| `skeleton_bones_list` | pure Python | Bones with parent_index / parent_name. v1.12 walks `SkeletalMeshEditorSubsystem.get_bone_tree` first — returned empty on some 5.7 meshes via the old path. |
 | `skeleton_bone_transform` | pure Python | A bone's reference-pose transform in `bone` or `component` space. |
 | `actor_transform_query` | pure Python | Live world transform; optional component / bone / socket / relative_to. |
+
+### BP variable lifecycle (v1.12)
+
+| Tool | Companion | Purpose |
+|---|---|---|
+| `bp_variable_remove_direct` | **v1.12+** | Surgical remove via `FBlueprintEditorUtils::RemoveMemberVariable`. No collateral sweep — unlike `bp_variable_remove` which goes through `remove_unused_variables` and can take legit unused vars with it. Works on broken-typed vars (deleted-enum etc.). |
+| `bp_variable_rename_atomic` | **v1.12+** | Atomic rename via `FBlueprintEditorUtils::RenameMemberVariable`. Preserves type + metadata; does NOT leave the old var behind (the way `bp_variable_rename` does). |
+| `bp_variable_retype` | **v1.12+** | In-place retype via `FBlueprintEditorUtils::ChangeMemberVariableType`. Same pin_category vocab as `bp_variable_add_typed`. Refs in graphs reconstruct. |
+
+### Runtime invoke + PIE input (v1.12)
+
+| Tool | Companion | Purpose |
+|---|---|---|
+| `runtime_invoke` | **v1.12+** | Call a BP-exposed event/function on a live PIE/level object. Target via `player_index` (controlled pawn) or `actor_label` (display label) + optional `component_name`. `args` is a flat list of strings in `ImportText` format — one per declared parameter, in order. Returns the function's return value exported as text. |
+| `pie_input_inject` | **v1.12+** | Deliver input to PIE. Pass `action_path` (Enhanced Input `UInputAction`) OR `key_name` (raw FKey). `event` ∈ {pressed, released, repeat, doubleclick} for keys. `amount` is scalar value / pressure. `value_vector` covers Axis2D/Axis3D actions. Routes to a chosen `player_index`. |
+
+### Inspection (single node)
+
+| Tool | Companion | Purpose |
+|---|---|---|
+| `bp_node_inspect_by_guid` | **v1.12+** | Return ONE node's full info (class, title, position, pins with `linked_count` + types) instead of dumping the whole graph through `bp_graph_nodes_list`. Use it for wiring in 600+ node event graphs that exceed the tool output limit. |
+
+### SCS component template (v1.12)
+
+| Tool | Companion | Purpose |
+|---|---|---|
+| `bp_set_component_property_typed` | **v1.12+** | Typed SCS template setter — writes to the COMPONENT TEMPLATE so spawned instances inherit (not just the CDO). Accepts numerics, booleans, `FVector` / `FRotator` / `FTransform` / `FLinearColor` literals, enum names, asset paths for object refs. Replaces `bp_set_component_property` which treats `value` as a string. |
 
 ## SB_JSON marker protocol
 

@@ -2,7 +2,7 @@
 id: systembridge-overview
 title: SystemBridge — Overview
 status: stable
-version: 26.603.2027
+version: 26.606.219
 tags: [ overview, index ]
 ---
 
@@ -125,6 +125,24 @@ Three loosely-coupled goals:
 - "Feed per-frame data from the AnimBP into a Control Rig (hand IK targets, alphas)." →
   [control rig authoring → rig variables](unreal/control-rig-authoring.md#rig-variables-v110)
   → `control_rig_variable_add` (direction=input) + `control_rig_variable_get_node_add` + `control_rig_add_link`.
+- "Refactor a Blueprint variable's name / type / removal cleanly — including a broken-typed var that won't delete." →
+  [blueprint authoring → variable lifecycle](unreal/blueprint-authoring.md#variable-lifecycle--add-set-rename-remove-retype)
+  → `bp_variable_rename_atomic` / `bp_variable_retype` / `bp_variable_remove_direct`.
+- "Set a typed default (vector, transform, double, asset path) on a Blueprint component template so spawned instances inherit it." →
+  [blueprint authoring → SCS component templates](unreal/blueprint-authoring.md#scs-component-templates--bp_set_component_property_typed)
+  → `bp_set_component_property_typed`.
+- "Author a SkeletalMesh socket headlessly with parent bone + offset." →
+  [transform query → author a socket](unreal/transform-query.md#author-a-socket-on-a-skeletalmesh--mesh_socket_add)
+  → `mesh_socket_add`.
+- "Fire an input action (Reload, Slot1, Fire) in PIE without a keyboard." →
+  [PIE input injection](unreal/pie-input.md)
+  → `pie_input_inject` with `action_path`.
+- "Call a Blueprint event/function on a live PIE object with typed args; read the return value." →
+  [runtime invoke](unreal/runtime-invoke.md)
+  → `runtime_invoke`.
+- "Inspect ONE node's pins in a 600-node event graph without dumping the whole graph." →
+  [blueprint authoring → single-node inspection](unreal/blueprint-authoring.md#single-node-inspection--bp_node_inspect_by_guid)
+  → `bp_node_inspect_by_guid`.
 
 ## Repository
 

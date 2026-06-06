@@ -2,7 +2,7 @@
 id: blueprint-authoring-headless
 title: Blueprint Authoring (headless)
 status: stable
-version: 26.601.2245
+version: 26.606.219
 tags: [ unreal, blueprint, authoring ]
 ---
 
@@ -328,6 +328,152 @@ bp_node_set_position(bp_path, graph_name, node_guid, x, y)
 bp_node_remove(bp_path, graph_name, node_guid)            # severs links first
 bp_node_reconstruct(bp_path, graph_name, node_guid)       # re-runs AllocateDefaultPins
                                                           # after a property mutation
+```
+
+## Single-node inspection — `bp_node_inspect_by_guid`
+
+**v1.12+**. `bp_graph_nodes_list` returns every node in a graph. For
+large event graphs (600+ nodes) the response exceeds the tool output
+limit — you can't read one node's pins without dumping the whole graph
+to a file.
+
+`bp_node_inspect_by_guid` returns ONE node's full info:
+
+```
+bp_node_inspect_by_guid(bp_path, graph_name, node_guid)
+  → {
+    success: true,
+    node_class: "/Script/BlueprintGraph.K2Node_CallFunction",
+    title: "PlayMontage",
+    position: [400, 200],
+    pins: [
+      { name: "AnimMontage", direction: "input", pin_category: "object",
+        pin_sub_category_object: "/Script/Engine.AnimMontage",
+        linked_count: 1, default_value: "None" },
+      …
+    ],
+  }
+```
+
+The pin shape matches what `bp_node_link_pins` expects, so you can wire
+straight from the output without a full-graph dump. Use it during
+iterative wiring on large graphs.
+
+## SCS component templates — `bp_set_component_property_typed`
+
+**v1.12+**. A Blueprint's components placed via the Components panel
+live on the BP's SCS (Simple Construction Script). Each one has a
+*template* archetype on the generated class — the values an instance
+is spawned with.
+
+`bp_variable_set_default` sets the BP CLASS default — it does NOT
+propagate to a component already placed on an actor via SCS (the placed
+template keeps its captured value). To change what a spawned component
+actually has, write to the SCS template.
+
+The original `bp_set_component_property` treats `value` as a string and
+rejects struct / numeric literals. `bp_set_component_property_typed`
+fixes both halves — it writes to the template AND accepts typed values:
+
+```
+bp_set_component_property_typed(
+  bp_path="/Game/Characters/BP_Hero",
+  component_var_name="Mesh",
+  property="RelativeLocation",
+  value="(X=0.0,Y=0.0,Z=-90.0)",
+)
+
+bp_set_component_property_typed(
+  bp_path="/Game/.../BP_DamageZone",
+  component_var_name="DamageDuration",
+  property="Value",
+  value="2.5",                       # double, not a string
+)
+
+bp_set_component_property_typed(
+  bp_path="/Game/.../BP_Pickup",
+  component_var_name="PickupSound",
+  property="Sound",
+  value="/Game/Audio/SC_PickupBeep.SC_PickupBeep",
+)
+```
+
+`value` accepts:
+
+| UE type | Example |
+|---|---|
+| scalar | `2.5`, `42`, `True` |
+| `FVector` | `(X=1.0,Y=0.0,Z=-90.0)` |
+| `FRotator` | `(Pitch=0,Yaw=90,Roll=0)` |
+| `FTransform` | `(Rotation=(X=0,Y=0,Z=0,W=1),Translation=(...),Scale3D=(...))` |
+| `FLinearColor` | `(R=1.0,G=0.5,B=0.0,A=1.0)` |
+| enum | enum entry name |
+| object / class | asset / class path |
+
+The value goes through `FProperty::ImportText_InContainer` on the
+SCS template; coercion errors return a precise error naming the
+property and expected type.
+
+## Variable lifecycle — add, set, rename, remove, retype
+
+Add a typed variable with [`bp_variable_add_typed`](#object--class--struct--enum--containers--bp_variable_add_typed),
+set its default with [`bp_variable_set_default`](#variable-defaults--bp_variable_set_default).
+For changes after the fact:
+
+| Tool | When | Method |
+|---|---|---|
+| `bp_variable_remove_direct` | Removing a single variable, including a broken-typed one (deleted enum/struct/class). | `FBlueprintEditorUtils::RemoveMemberVariable`. **No collateral**: removes only the named variable. |
+| `bp_variable_rename_atomic` | True refactor — keep all metadata, no junk left behind. | `FBlueprintEditorUtils::RenameMemberVariable`. Preserves type + category + replication flags. |
+| `bp_variable_retype` | Existing variable, new type (e.g. "the enum this var pointed at was deleted, re-point at the recreated enum"). | `FBlueprintEditorUtils::ChangeMemberVariableType`. Same `pin_category` vocabulary as `bp_variable_add_typed`. Refs reconstruct. |
+
+All three require Companion **v1.12+**.
+
+> **Avoid** `bp_variable_remove` and `bp_variable_rename` for new code:
+> the former runs `remove_unused_variables` and can take legit
+> graph-unused vars with it; the latter creates a new var + repoints
+> refs but leaves the old definition orphaned. They predate v1.12 and
+> remain only for the broken-typed corner case where nothing else works.
+
+### Example — retype to a freshly-recreated enum
+
+```
+# An old enum the var pointed at was deleted; the asset is gone but the
+# variable still references it as a broken null-enum. We recreate the
+# enum and re-point the variable in place.
+bp_variable_retype(
+  bp_path="/Game/Survival/ALS_SpawnComponent",
+  name="WeaponState",
+  pin_category="enum",
+  sub_object_path="/Game/Enums/E_WeaponState.E_WeaponState",
+)
+# Variable's FEdGraphPinType is rebuilt; existing Get/Set nodes in graphs
+# reconstruct against the new type.
+```
+
+### Example — rename a variable used across many graphs
+
+```
+bp_variable_rename_atomic(
+  bp_path="/Game/.../BP_Survivor",
+  old_name="HasAmmo",
+  new_name="bHasAmmo",
+)
+# Single FBPVariableDescription is renamed in place; every Get/Set node
+# references the same description by GUID, so all refs update without a
+# search-replace pass.
+```
+
+### Example — remove a broken-typed variable
+
+```
+bp_variable_remove_direct(
+  bp_path="/Game/.../ALS_SpawnComponent",
+  name="OldBrokenEnumVar",
+)
+# Removes the FBPVariableDescription regardless of type validity
+# — `remove_unused_variables` skips broken-typed vars; this one doesn't.
+# Existing Get/Set node refs orphan (turn red) just like the editor's
+# Delete action.
 ```
 
 ## Replication

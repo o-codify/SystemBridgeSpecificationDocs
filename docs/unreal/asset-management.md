@@ -2,7 +2,7 @@
 id: asset-management
 title: Asset Management
 status: stable
-version: 26.602.1331
+version: 26.606.219
 tags: [ unreal, assets ]
 ---
 
@@ -248,6 +248,13 @@ What changes:
 - Every `FAnimSegment.AnimReference` is swapped for `source_animation`.
 - Segment timings are retimed to the new clip's `GetPlayLength()`
   (`AnimStartTime=0`, `AnimEndTime=length`, `PlayRate=1`, `LoopCount=1`).
+- **v1.12+**: Companion sweeps the duplicated montage with
+  `FArchiveReplaceObjectRef` after the segment swap — replacing every
+  pointer to any of the template's anims with the new source. Without
+  this, notify-linked sequences / time-stretch metadata / etc. can
+  carry the original past a per-segment swap, leaving the template's
+  clip in the produced montage's package dependencies (v1.11.x
+  regression — v1.12 deps contain only the new clip).
 
 Verification after authoring:
 
@@ -429,3 +436,24 @@ next save.
 - [unreal plugin tool catalog](../plugins/unreal.md#asset--content-browser).
 - [message log](message-log.md) — `LoadErrors` lists assets that failed
   to load.
+
+### Robust path resolution (v1.12+)
+
+A UE 5.7.4 regression observed in the field: `EditorAssetLibrary` path
+lookups can go **blind** for valid, loaded assets in an otherwise
+healthy editor session —
+`does_asset_exist`/`load_asset`/`list_assets` all return empty even
+though `AssetRegistry.get_assets` and `unreal.load_asset` see the
+same assets fine.
+
+Companion **v1.12.0+** ships a `load_asset_with_fallback` binding
+(used by every path-based helper internally):
+
+1. Try `UEditorAssetLibrary::LoadAsset` (fast path, normal case).
+2. If null, try `IAssetRegistry::GetAssetByObjectPath` → `AssetData.GetAsset`.
+3. If still null, try `StaticLoadObject`.
+
+This means a `blueprint_not_found` style error from a v1.12+ tool is a
+*real* not-found, not an EAL blind spot. If a tool you call still
+reports not-found and you can reach the asset via `run_python` +
+`unreal.load_asset`, file a bug — the fallback is supposed to cover that.

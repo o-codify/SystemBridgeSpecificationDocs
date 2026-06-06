@@ -2,7 +2,7 @@
 id: unreal-deep-dive
 title: Unreal — Deep Dive
 status: stable
-version: 26.603.2027
+version: 26.606.219
 tags: [ unreal, ue, index ]
 ---
 
@@ -35,7 +35,11 @@ For the tool catalog (every UE tool with one-line descriptions), see
 - [AnimGraph authoring](animgraph-authoring.md) — headless `UAnimGraphNode_*`
   CRUD: place a Control Rig node, set inner properties, expose pins (v1.11+).
 - [Transform query](transform-query.md) — read sockets / bones / actor world
-  transforms (pure Python).
+  transforms; **v1.12** also adds headless socket authoring.
+- [PIE input injection](pie-input.md) — deliver input to the running PIE
+  session (Enhanced Input + raw keys) (v1.12+).
+- [Runtime invoke](runtime-invoke.md) — call a BP-exposed event/function
+  on a live PIE object with typed args (v1.12+).
 - [editor_status reference](#editor_status) (this page).
 
 ## When to use what

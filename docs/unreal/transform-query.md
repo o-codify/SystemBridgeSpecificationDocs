@@ -2,7 +2,7 @@
 id: transform-query-sockets-bones-actors
 title: Transform Query (sockets, bones, actors)
 status: stable
-version: 26.603.2027
+version: 26.606.219
 tags: [ unreal, transforms, sockets, bones, queries, pure-python ]
 ---
 
@@ -35,9 +35,10 @@ and bake correct values.
 
 | Tool | Purpose |
 | ---- | ------- |
-| `mesh_sockets_list` | List sockets on a SkeletalMesh or StaticMesh. Each entry: name, parent_bone, relative location/rotation/scale. |
+| `mesh_sockets_list` | List sockets on a SkeletalMesh or StaticMesh. Each entry: name, parent_bone, relative location/rotation/scale. **v1.12** switched to the public `num_sockets()` / `get_socket_by_index()` API — v1.11 hit the protected `Sockets` UPROPERTY and dumped a ~270KB traceback on 5.7. |
 | `mesh_socket_transform` | A SkeletalMesh socket's relative transform PLUS its parent bone's component-space transform. Static ref-pose, no PIE. |
-| `skeleton_bones_list` | Bones on a Skeleton (accepts Skeleton OR SkeletalMesh path). index, name, parent_index, parent_name. |
+| `mesh_socket_add` | **v1.12+**. Create or update a socket headlessly with parent bone + relative transform. UE 5.7 Python can't set `BoneName` on a fresh socket (`VisibleAnywhere + BlueprintReadOnly`); this binding wraps `USkeletalMesh::AddSocket`. Idempotent on socket name. Optional `add_to_skeleton`. |
+| `skeleton_bones_list` | Bones on a Skeleton (accepts Skeleton OR SkeletalMesh path). index, name, parent_index, parent_name. **v1.12** walks `SkeletalMeshEditorSubsystem.get_bone_tree` on the mesh first — the v1.11 path returned empty for some meshes whose Skeleton binding is gimped on 5.7. |
 | `skeleton_bone_transform` | A bone's reference-pose transform in `"bone"` (local) or `"component"` space. |
 
 ### Live (PIE / level)
@@ -75,6 +76,26 @@ unreal_mesh_socket_transform(
 )
 # → relative + parent_bone_component_space
 ```
+
+### Author a socket on a SkeletalMesh — `mesh_socket_add`
+
+```python
+# Add a "MuzzleSocket" on the weapon mesh, parented to the WeaponRoot bone,
+# offset 30cm forward.
+unreal_mesh_socket_add(
+    mesh_path="/Game/Weapons/SK_Pistol",
+    socket_name="MuzzleSocket",
+    parent_bone="WeaponRoot",
+    relative_location=[30.0, 0.0, 0.0],
+    relative_rotation=[0.0, 0.0, 0.0],
+)
+# → socket survives save/reload; find_socket("MuzzleSocket") resolves it
+#   with bone_name="WeaponRoot".
+```
+
+Idempotent: calling again with a different bone or offset updates the
+existing socket. Pass `add_to_skeleton=True` to also register on the
+bound Skeleton asset (the editor's "Add to Skeleton" checkbox).
 
 ### Bake grip offset between weapon-grip and hand-bone
 
