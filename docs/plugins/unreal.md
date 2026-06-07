@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.607.1747
+version: 26.607.1749
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -315,6 +315,7 @@ Linking pose AND data pins reuses `bp_node_link_pins` / `bp_node_break_link` / `
 | `assets_find_references` | none | List every asset whose import table references `target_path`. Walks /Game/** uassets on disk. 1000-asset project in 1-3s. Refactor planning. |
 | `assets_find_by_class` | none | List every asset whose top-level export class matches any candidate (short name or full path). "all DataTables", "all AnimBPs" audits. |
 | `assets_scan_offline` | none | Project-wide audit: class histogram + engine-family histogram + top 20 referenced packages. Diagnose project structure. |
+| `assets_outdated` | none | List assets saved with an older UE engine version. Useful after a UE upgrade — flags files that need re-saving. Threshold default 5.7 (file_version_ue5 = 1009). |
 
 ## SB_JSON marker protocol
 
