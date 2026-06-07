@@ -1,8 +1,8 @@
 ---
 id: bulk-offline-asset-scanner
 title: Bulk Offline Asset Scanner
-status: review
-version: 26.607.1749
+status: stable
+version: 26.607.2208
 tags: [ unreal, performance, offline, audit, refactor ]
 ---
 
