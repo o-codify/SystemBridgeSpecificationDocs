@@ -69,7 +69,7 @@ build will hit "file in use" on the DLL link step).
 v1.3.1+ adds a permanent widget on the LevelEditor's status bar:
 
 ```
-[● green dot] SB v1.12.3
+[● green dot] SB v1.13.1
 ```
 
 Tooltip lists what's armed and the repo URL. Hover-to-confirm replaces
