@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.607.1700
+version: 26.607.1717
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -304,6 +304,8 @@ Linking pose AND data pins reuses `bp_node_link_pins` / `bp_node_break_link` / `
 | `bp_set_component_property_typed` | **v1.12+** | Typed SCS template setter — writes to the COMPONENT TEMPLATE so spawned instances inherit (not just the CDO). Accepts numerics, booleans, `FVector` / `FRotator` / `FTransform` / `FLinearColor` literals, enum names, asset paths for object refs. v1.12.1: `ClassProperty` (e.g. `anim_class`) now resolves correctly (tries `_C` suffix + `LoadObject->GeneratedClass`). Replaces `bp_set_component_property` which treats `value` as a string. |
 | `bp_component_remove` | **v1.12.1+** | Remove a component from a Blueprint's SCS. Symmetric counterpart to `bp_component_add` (`SubobjectDataSubsystem.delete_subobject` + compile + save). Idempotent. |
 | `anim_reassign_asset` | **v1.12.1+** | By-value asset reassignment in an AnimBP: walks every `AnimGraphNode_*` whose inner `FAnimNode_*` references `from_asset` and rewrites to `to_asset`. Optional `graph_filter` substring scopes to one state-machine graph. Returns per-node trail. |
+| `asset_version_info` | **v1.12.2+** | Saved engine version + custom-version container + warnings for an asset. Diagnoses 'why won't this load' failures (engine-skew, custom-version mismatch). |
+| `asset_metadata` | **v1.12.2+** | Per-object metadata key-value pairs for the asset + its immediate subobjects (`UMetaData::GetMapForObject`). Author-time hints, tooltips, categories. |
 
 ## SB_JSON marker protocol
 
