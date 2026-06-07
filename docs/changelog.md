@@ -2,7 +2,7 @@
 id: changelog
 title: Changelog
 status: stable
-version: 26.607.1717
+version: 26.607.1731
 tags: [ changelog ]
 ---
 
@@ -11,6 +11,12 @@ tags: [ changelog ]
 Milestones for SystemBridge as a whole — daemon (`sb.exe`), plugins,
 and the Unreal Companion sub-plugin. Individual companion versions are
 also captured in [companion plugin reference](unreal/companion.md).
+
+## Recent: bulk offline asset scanner (no companion / no editor)
+
+| Date | Tag | What |
+|---|---|---|
+| 2026-Q2 | sb-unreal | Three new offline tools that walk `.uasset` headers directly: `assets_find_references` (who references this?), `assets_find_by_class` (every BP / DataTable / AnimBP / ...), `assets_scan_offline` (project-wide audit). 1000-asset project completes in 1-3 seconds; equivalent editor-RPC paths take 30-150 seconds. Go-port path (vs C# wrapper) — in-process, no shellout. |
 
 ## Recent: Companion v1.11.x — AnimGraph authoring + transform queries
 
