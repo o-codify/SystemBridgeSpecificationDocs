@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.607.1731
+version: 26.607.1747
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -306,6 +306,7 @@ Linking pose AND data pins reuses `bp_node_link_pins` / `bp_node_break_link` / `
 | `anim_reassign_asset` | **v1.12.1+** | By-value asset reassignment in an AnimBP: walks every `AnimGraphNode_*` whose inner `FAnimNode_*` references `from_asset` and rewrites to `to_asset`. Optional `graph_filter` substring scopes to one state-machine graph. Returns per-node trail. |
 | `asset_version_info` | **v1.12.2+** | Saved engine version + custom-version container + warnings for an asset. Diagnoses 'why won't this load' failures (engine-skew, custom-version mismatch). |
 | `asset_metadata` | **v1.12.2+** | Per-object metadata key-value pairs for the asset + its immediate subobjects (`UMetaData::GetMapForObject`). Author-time hints, tooltips, categories. |
+| `bp_function_bytecode` | **v1.12.3+** | Line-by-line Kismet bytecode disassembly for one BP function. Covers ~80 common EX_* opcodes; unknown ones as `EX_0xNN (raw)`. Diagnoses 'graph compiles but runtime is wrong' — compiler-pruned branches, missing self-context, wrong cast paths. |
 
 ### Bulk offline scanner (no editor)
 
