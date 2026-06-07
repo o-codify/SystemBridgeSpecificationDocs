@@ -2,7 +2,7 @@
 id: changelog
 title: Changelog
 status: stable
-version: 26.607.1747
+version: 26.607.2122
 tags: [ changelog ]
 ---
 
@@ -23,6 +23,11 @@ also captured in [companion plugin reference](unreal/companion.md).
 | Date | Tag | What |
 |---|---|---|
 | 2026-Q2 | **Companion v1.12.3** | BP compiled bytecode inspector — `bp_function_bytecode(bp_path, function_name)` returns line-by-line disassembly. Covers ~80 common EX_* opcodes; unknown ones as `EX_0xNN (raw)`. Diagnoses 'graph looks right but runtime is wrong' cases. Closes the bp-compiled-bytecode-inspector roadmap request. |
+| 2026-Q2 | **Companion v1.13.1** | Macros + interface impl + function locals — 8 new tools closing three Blueprint authoring gaps that real projects hit. Macros: `bp_macros_list` / `bp_macro_create` / `bp_node_macro_instance_target`. Interface implementation: `bp_interfaces_list` / `bp_interface_add` (idempotent) / `bp_interface_remove`. Function locals: `bp_function_locals_list` / `bp_function_local_add`. |
+| 2026-Q2 | **Companion v1.13.0** | AnimGraph state machine authoring — six tools (states list / add state / add conduit / add transition / entry state / inner graph). Closes the biggest remaining AnimGraph gap. Transition rule authoring deferred. |
+| 2026-Q2 | **Companion v1.12.5** | Bytecode operand decode — extends `bp_function_bytecode` with per-opcode operand decode (FProperty names, UFunction names, typed constants, casts, jumps). ~40 opcodes. Diagnoses 'graph compiles but runtime is wrong' concretely. |
+| 2026-Q2 | **Companion v1.12.4** | Polish pass: structured `_expect_*` helpers (every not_found / wrong_class carries an actionable `hint`), universal `limit`/`offset` pagination on list tools (anim_blueprint_nodes / bp_variables_list / anim_blueprint_graphs), back-compat aliases preserve pre-v1.12.4 response keys. Closes the AnimBP output-overflow request. |
+| 2026-Q2 | sb-unreal | Tool registry consistency tests (Go) — catches drift between sb_helpers.py / *_tools.go / main.go manifest entries early; current floor 80, ceiling 400, currently 189. |
 | 2026-Q2 | **Companion v1.12.2** | `asset_version_info` + `asset_metadata` — first two of the asset-version-and-metadata roadmap. Diagnose 'why won't this asset load' (engine-skew + custom-version mismatch) and read per-object metadata (author hints, tooltips, categories). `level_actors_offline` deferred to bulk-offline-scanner work. |
 | 2026-Q2 | **Companion v1.12.1** | Closes the AnimBP / BP component tooling gaps request. `bp_set_component_property_typed` ClassProperty resolution fix (path → `_C` → `GeneratedClass`); new `bp_component_remove` (SubobjectDataSubsystem.delete_subobject + compile + save); `anim_blueprint_nodes` now returns `graph_path` + `node_guid` + `current_asset` per entry; new `anim_reassign_asset(from, to, graph_filter)` for by-value asset rewrite across an AnimBP. |
 | 2026-Q2 | **Companion v1.12.0** | Eight spec requests in one drop: BP variable lifecycle (`bp_variable_remove_direct` / `_rename_atomic` / `_retype` — surgical, atomic, no collateral), SkeletalMesh socket authoring + read fixes (`mesh_socket_add` sets parent bone; helper switched to public socket-by-index API), SCS typed property setter (`bp_set_component_property_typed`), runtime PIE invoke (`runtime_invoke`), Enhanced Input + raw key injection (`pie_input_inject`), single-node inspect (`bp_node_inspect_by_guid`), `LoadAssetWithFallback` (defensive AssetRegistry path when EAL goes blind in 5.7.4), AnimMontage clip-swap regression fix (`FArchiveReplaceObjectRef` sweep across the duplicated montage). Build.cs picks up `AssetRegistry`, `EditorScriptingUtilities`, `InputCore`. |
