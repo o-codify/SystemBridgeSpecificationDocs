@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.606.219
+version: 26.607.2208
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -301,7 +301,44 @@ Linking pose AND data pins reuses `bp_node_link_pins` / `bp_node_break_link` / `
 
 | Tool | Companion | Purpose |
 |---|---|---|
-| `bp_set_component_property_typed` | **v1.12+** | Typed SCS template setter — writes to the COMPONENT TEMPLATE so spawned instances inherit (not just the CDO). Accepts numerics, booleans, `FVector` / `FRotator` / `FTransform` / `FLinearColor` literals, enum names, asset paths for object refs. Replaces `bp_set_component_property` which treats `value` as a string. |
+| `bp_set_component_property_typed` | **v1.12+** | Typed SCS template setter — writes to the COMPONENT TEMPLATE so spawned instances inherit (not just the CDO). Accepts numerics, booleans, `FVector` / `FRotator` / `FTransform` / `FLinearColor` literals, enum names, asset paths for object refs. v1.12.1: `ClassProperty` (e.g. `anim_class`) now resolves correctly (tries `_C` suffix + `LoadObject->GeneratedClass`). Replaces `bp_set_component_property` which treats `value` as a string. |
+| `bp_component_remove` | **v1.12.1+** | Remove a component from a Blueprint's SCS. Symmetric counterpart to `bp_component_add` (`SubobjectDataSubsystem.delete_subobject` + compile + save). Idempotent. |
+| `anim_reassign_asset` | **v1.12.1+** | By-value asset reassignment in an AnimBP: walks every `AnimGraphNode_*` whose inner `FAnimNode_*` references `from_asset` and rewrites to `to_asset`. Optional `graph_filter` substring scopes to one state-machine graph. Returns per-node trail. |
+| `asset_version_info` | **v1.12.2+** | Saved engine version + custom-version container + warnings for an asset. Diagnoses 'why won't this load' failures (engine-skew, custom-version mismatch). |
+| `asset_metadata` | **v1.12.2+** | Per-object metadata key-value pairs for the asset + its immediate subobjects (`UMetaData::GetMapForObject`). Author-time hints, tooltips, categories. |
+| `bp_function_bytecode` | **v1.12.3+** | Line-by-line Kismet bytecode disassembly for one BP function. v1.12.5 decodes operands (FProperty names, UFunction names, typed constants, casts, jumps, switch cases). Diagnoses 'graph compiles but runtime is wrong' — self-context bugs become 'EX_LocalOutVariable without preceding EX_Self'. |
+
+### Macros / interfaces / function locals (v1.13.1)
+
+| Tool | Companion | Purpose |
+|---|---|---|
+| `bp_macros_list` | **v1.13.1+** | List macro graphs defined on a Blueprint. |
+| `bp_macro_create` | **v1.13.1+** | Create a new macro graph (`FBlueprintEditorUtils::AddMacroGraph`). |
+| `bp_node_macro_instance_target` | **v1.13.1+** | Wire a `K2Node_MacroInstance` to a named macro on the same BP or an external BPL. |
+| `bp_interfaces_list` | **v1.13.1+** | List interfaces implemented by a Blueprint. |
+| `bp_interface_add` | **v1.13.1+** | Implement an interface (`FBlueprintEditorUtils::ImplementNewInterface`). Idempotent; auto `_C` resolution. |
+| `bp_interface_remove` | **v1.13.1+** | Symmetric remove. |
+| `bp_function_locals_list` | **v1.13.1+** | List local variables on a function graph (walks `UK2Node_FunctionEntry::LocalVariables`). |
+| `bp_function_local_add` | **v1.13.1+** | Add a typed local variable. Same pin_category vocab as `bp_variable_add_typed`. |
+
+### AnimGraph state machines (v1.13.0)
+
+| Tool | Companion | Purpose |
+|---|---|---|
+| `anim_state_machine_states_list` | **v1.13.0+** | List states with `{guid, name, kind, asset_path, out_transitions}`. kind ∈ {state, conduit, entry, transition}. |
+| `anim_state_machine_add_state` | **v1.13.0+** | Add a UAnimStateNode. Returns guid. Optional state_name renames the BoundGraph. |
+| `anim_state_machine_add_conduit` | **v1.13.0+** | Add a UAnimStateConduitNode (transition routing). |
+| `anim_state_machine_add_transition` | **v1.13.0+** | Add a transition between two states / conduits. Auto-wires From→Trans→To. Transition rule (boolean) authoring deferred. |
+| `anim_state_machine_entry_state` | **v1.13.0+** | Get the guid of the entry state. |
+
+### Bulk offline scanner (no editor)
+
+| Tool | Companion | Purpose |
+|---|---|---|
+| `assets_find_references` | none | List every asset whose import table references `target_path`. Walks /Game/** uassets on disk. 1000-asset project in 1-3s. Refactor planning. |
+| `assets_find_by_class` | none | List every asset whose top-level export class matches any candidate (short name or full path). "all DataTables", "all AnimBPs" audits. |
+| `assets_scan_offline` | none | Project-wide audit: class histogram + engine-family histogram + top 20 referenced packages. Diagnose project structure. |
+| `assets_outdated` | none | List assets saved with an older UE engine version. Useful after a UE upgrade — flags files that need re-saving. Threshold default 5.7 (file_version_ue5 = 1009). |
 
 ## SB_JSON marker protocol
 

@@ -2,7 +2,7 @@
 id: unreal-deep-dive
 title: Unreal — Deep Dive
 status: stable
-version: 26.606.219
+version: 26.607.2208
 tags: [ unreal, ue, index ]
 ---
 
@@ -40,6 +40,9 @@ For the tool catalog (every UE tool with one-line descriptions), see
   session (Enhanced Input + raw keys) (v1.12+).
 - [Runtime invoke](runtime-invoke.md) — call a BP-exposed event/function
   on a live PIE object with typed args (v1.12+).
+- [Bulk offline scanner](bulk-offline-scanner.md) — walk `.uasset` headers
+  on disk for project-wide audits (no editor required). 50x faster than
+  editor RPC for 1000-asset workloads.
 - [editor_status reference](#editor_status) (this page).
 
 ## When to use what
