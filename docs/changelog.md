@@ -2,7 +2,7 @@
 id: changelog
 title: Changelog
 status: stable
-version: 26.606.212
+version: 26.607.2208
 tags: [ changelog ]
 ---
 
@@ -12,10 +12,24 @@ Milestones for SystemBridge as a whole — daemon (`sb.exe`), plugins,
 and the Unreal Companion sub-plugin. Individual companion versions are
 also captured in [companion plugin reference](unreal/companion.md).
 
+## Recent: bulk offline asset scanner (no companion / no editor)
+
+| Date | Tag | What |
+|---|---|---|
+| 2026-Q2 | sb-unreal | Three new offline tools that walk `.uasset` headers directly: `assets_find_references` (who references this?), `assets_find_by_class` (every BP / DataTable / AnimBP / ...), `assets_scan_offline` (project-wide audit). 1000-asset project completes in 1-3 seconds; equivalent editor-RPC paths take 30-150 seconds. Go-port path (vs C# wrapper) — in-process, no shellout. |
+
 ## Recent: Companion v1.11.x — AnimGraph authoring + transform queries
 
 | Date | Tag | What |
 |---|---|---|
+| 2026-Q2 | **Companion v1.12.3** | BP compiled bytecode inspector — `bp_function_bytecode(bp_path, function_name)` returns line-by-line disassembly. Covers ~80 common EX_* opcodes; unknown ones as `EX_0xNN (raw)`. Diagnoses 'graph looks right but runtime is wrong' cases. Closes the bp-compiled-bytecode-inspector roadmap request. |
+| 2026-Q2 | **Companion v1.13.1** | Macros + interface impl + function locals — 8 new tools closing three Blueprint authoring gaps that real projects hit. Macros: `bp_macros_list` / `bp_macro_create` / `bp_node_macro_instance_target`. Interface implementation: `bp_interfaces_list` / `bp_interface_add` (idempotent) / `bp_interface_remove`. Function locals: `bp_function_locals_list` / `bp_function_local_add`. |
+| 2026-Q2 | **Companion v1.13.0** | AnimGraph state machine authoring — six tools (states list / add state / add conduit / add transition / entry state / inner graph). Closes the biggest remaining AnimGraph gap. Transition rule authoring deferred. |
+| 2026-Q2 | **Companion v1.12.5** | Bytecode operand decode — extends `bp_function_bytecode` with per-opcode operand decode (FProperty names, UFunction names, typed constants, casts, jumps). ~40 opcodes. Diagnoses 'graph compiles but runtime is wrong' concretely. |
+| 2026-Q2 | **Companion v1.12.4** | Polish pass: structured `_expect_*` helpers (every not_found / wrong_class carries an actionable `hint`), universal `limit`/`offset` pagination on list tools (anim_blueprint_nodes / bp_variables_list / anim_blueprint_graphs), back-compat aliases preserve pre-v1.12.4 response keys. Closes the AnimBP output-overflow request. |
+| 2026-Q2 | sb-unreal | Tool registry consistency tests (Go) — catches drift between sb_helpers.py / *_tools.go / main.go manifest entries early; current floor 80, ceiling 400, currently 189. |
+| 2026-Q2 | **Companion v1.12.2** | `asset_version_info` + `asset_metadata` — first two of the asset-version-and-metadata roadmap. Diagnose 'why won't this asset load' (engine-skew + custom-version mismatch) and read per-object metadata (author hints, tooltips, categories). `level_actors_offline` deferred to bulk-offline-scanner work. |
+| 2026-Q2 | **Companion v1.12.1** | Closes the AnimBP / BP component tooling gaps request. `bp_set_component_property_typed` ClassProperty resolution fix (path → `_C` → `GeneratedClass`); new `bp_component_remove` (SubobjectDataSubsystem.delete_subobject + compile + save); `anim_blueprint_nodes` now returns `graph_path` + `node_guid` + `current_asset` per entry; new `anim_reassign_asset(from, to, graph_filter)` for by-value asset rewrite across an AnimBP. |
 | 2026-Q2 | **Companion v1.12.0** | Eight spec requests in one drop: BP variable lifecycle (`bp_variable_remove_direct` / `_rename_atomic` / `_retype` — surgical, atomic, no collateral), SkeletalMesh socket authoring + read fixes (`mesh_socket_add` sets parent bone; helper switched to public socket-by-index API), SCS typed property setter (`bp_set_component_property_typed`), runtime PIE invoke (`runtime_invoke`), Enhanced Input + raw key injection (`pie_input_inject`), single-node inspect (`bp_node_inspect_by_guid`), `LoadAssetWithFallback` (defensive AssetRegistry path when EAL goes blind in 5.7.4), AnimMontage clip-swap regression fix (`FArchiveReplaceObjectRef` sweep across the duplicated montage). Build.cs picks up `AssetRegistry`, `EditorScriptingUtilities`, `InputCore`. |
 | 2026-Q2 | **Companion v1.11.1** | Two v1.11.0 bug fixes. `anim_node_add` couldn't return the guid for `AnimGraphNode_ControlRig` (and other subclasses that don't expose NodeGuid as a Python attribute) — the node WAS created; only the readback failed. Switched to the companion `get_node_guid` binding. Docstring/example path corrected: Control Rig anim node is `/Script/ControlRigDeveloper.AnimGraphNode_ControlRig`. `anim_node_expose_pin` couldn't toggle Control Rig rig variables because `UAnimGraphNode_CustomProperty` subclasses store bindable-variable pins in `CustomPinProperties`, not `ShowPinForProperties`. Now walks both via `FArrayProperty` reflection. New `anim_node_list_exposable_pins` enumerates both lists with `source` tags so callers can discover the bindable surface. |
 | 2026-Q2 | **Companion v1.11.0** | AnimGraph authoring — 5 tools mirroring the `bp_node_*` surface for `UAnimGraphNode_*` (ControlRig / TwoBoneIK / ModifyBone / LayeredBoneBlend / SequencePlayer / …). `anim_node_add` instantiates a node by class path; `anim_node_set_inner_property` writes UPROPERTYs on the inner `FAnimNode_*` runtime struct via `FProperty::ImportText_InContainer` (dot-notation, object/class leaves accept asset paths, reconstruct fires so class-driven pin sets update); `anim_node_expose_pin` toggles `ShowPinForProperties`; `anim_node_info` gives read parity; `anim_node_remove` routes through `bp_node_remove`. Linking reuses existing K2 link tools — AnimGraph nodes ARE UEdGraphNodes. Build.cs picks up `AnimGraph` + `AnimGraphRuntime`. Closes the AnimGraph half of headless authoring. See [animgraph authoring](unreal/animgraph-authoring.md). |
