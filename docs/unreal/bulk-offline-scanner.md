@@ -2,7 +2,7 @@
 id: bulk-offline-asset-scanner
 title: Bulk Offline Asset Scanner
 status: review
-version: 26.607.1733
+version: 26.607.1749
 tags: [ unreal, performance, offline, audit, refactor ]
 ---
 
@@ -70,6 +70,28 @@ unreal_assets_find_by_class(
 #   matches: [{package: "/Game/Data/DT_Weapons", class: "DataTable"}, ...]
 # }
 ```
+
+### `assets_outdated(root="/Game", current_ue5_version=1009)`
+
+Returns every asset whose saved engine version is older than the
+threshold. Default threshold: UE 5.7 (file_version_ue5 = 1009).
+
+```python
+unreal_assets_outdated()
+# → {
+#   root: "/Game",
+#   file_count: 1247,
+#   outdated_count: 18,
+#   by_engine_family: { "ue5": 1240, "ue4": 7 },
+#   outdated: [
+#     { package: "/Game/Legacy/BP_OldThing", engine_family: "ue4",
+#       file_version_ue4: 522, file_version_ue5: 0 },
+#     ...
+#   ],
+# }
+```
+
+Useful after a UE upgrade to find what still needs re-saving.
 
 ### `assets_scan_offline(root="/Game")`
 
