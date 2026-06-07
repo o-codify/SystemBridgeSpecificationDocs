@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.607.2123
+version: 26.607.2219
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -330,6 +330,25 @@ Linking pose AND data pins reuses `bp_node_link_pins` / `bp_node_break_link` / `
 | `anim_state_machine_add_conduit` | **v1.13.0+** | Add a UAnimStateConduitNode (transition routing). |
 | `anim_state_machine_add_transition` | **v1.13.0+** | Add a transition between two states / conduits. Auto-wires From→Trans→To. Transition rule (boolean) authoring deferred. |
 | `anim_state_machine_entry_state` | **v1.13.0+** | Get the guid of the entry state. |
+
+### Sequencer (Level Sequence) authoring (v1.14.0)
+
+Tracks-as-data, sections-as-data, keys-as-data. Pure Python via UE 5.7's
+`MovieSceneScriptingChannel` API — no companion required. Mirror coverage
+to how `bp_node_*` covers Blueprints.
+
+| Tool | Companion | Purpose |
+|---|---|---|
+| `sequencer_bindings_list` | none | List object bindings (possessables + spawnables) with class + track_count. Discovery surface — guids feed every other tool. |
+| `sequencer_tracks_list` | none | List tracks on a binding (or master tracks if `binding_guid` empty). Track `name` is the value to pass back as `track_guid`. |
+| `sequencer_track_info` | none | List sections on a track with each section's channel inventory (name + type + key_count). Section index is the section_guid. |
+| `sequencer_keys_list` | none | List keys on a section, optionally restricted to one channel. Each key: {channel, type, time, value, interpolation}. |
+| `sequencer_track_add` | none | Add a track to a binding (or master). Vocab: `transform / float / bool / integer / byte / vector / color / event / audio / camera_cut / anim / subscene / actor_ref` or a raw `MovieScene*Track` class name. |
+| `sequencer_track_remove` | none | Remove a track by name. Idempotent. |
+| `sequencer_section_add` | none | Add a section to a track with `[start_frame, end_frame)`. Frames are tick-resolution (see `sequence_info`). Returns `section_index` to pass back as `section_guid`. |
+| `sequencer_key_add` | none | Write a key on a section's channel. Channel FNames vary by track — discover via `sequencer_track_info`. Common: `Location.X/Y/Z`, `Rotation.X/Y/Z`, `Value`, `R/G/B/A`. `interpolation` ∈ {auto, user, break, linear, constant}. |
+| `sequencer_key_remove` | none | Remove every key at the given time on a channel. Idempotent. |
+| `sequencer_binding_add` | none | Bind an existing level actor as a possessable. `actor_path` accepts label or full object path. Returns `binding_guid`. The actor must already exist in the active level. |
 
 ### Bulk offline scanner (no editor)
 
