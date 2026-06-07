@@ -2,11 +2,27 @@
 id: request-compiled-blueprint-bytecode-kismet-read-only-inspector
 title: "Request: compiled Blueprint bytecode (Kismet) read-only inspector"
 status: request
-version: 26.607.1703
+version: 26.607.1747
 tags: [ unreal, blueprint, kismet, diagnostic, request ]
 ---
 
 # Request: compiled Blueprint bytecode inspector
+
+## Status (2026-Q2)
+
+**Shipped** in Companion v1.12.3 (commit 70d94b5):
+
+- ✅ `bp_function_bytecode(bp_path, function_name)` — line-by-line disassembly.
+
+Coverage: ~80 most common EX_* opcodes by name. Unknown opcodes surface as `EX_0xNN (raw)` — caller still sees offsets. Operand decode (the full "EX_CallMath → AnimSequenceLength" comment column) is NOT yet implemented; opcode sequence is usually enough to spot pruning / branch logic problems.
+
+`bp_function_bytecode_summary` (the second proposed tool) deferred — class-grouped histogram across functions can be built in Python on top of the per-function output if needed.
+
+---
+
+Original request below.
+
+# Request (original)
 
 **Origin.** UAssetAPI ships **100 Kismet bytecode opcode classes**
 (`EX_LocalVariable`, `EX_CallMath`, `EX_StructConst`, `EX_DynamicCast`,
