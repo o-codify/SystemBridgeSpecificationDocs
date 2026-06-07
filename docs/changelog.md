@@ -2,7 +2,7 @@
 id: changelog
 title: Changelog
 status: stable
-version: 26.607.1700
+version: 26.607.1717
 tags: [ changelog ]
 ---
 
@@ -16,6 +16,7 @@ also captured in [companion plugin reference](unreal/companion.md).
 
 | Date | Tag | What |
 |---|---|---|
+| 2026-Q2 | **Companion v1.12.2** | `asset_version_info` + `asset_metadata` — first two of the asset-version-and-metadata roadmap. Diagnose 'why won't this asset load' (engine-skew + custom-version mismatch) and read per-object metadata (author hints, tooltips, categories). `level_actors_offline` deferred to bulk-offline-scanner work. |
 | 2026-Q2 | **Companion v1.12.1** | Closes the AnimBP / BP component tooling gaps request. `bp_set_component_property_typed` ClassProperty resolution fix (path → `_C` → `GeneratedClass`); new `bp_component_remove` (SubobjectDataSubsystem.delete_subobject + compile + save); `anim_blueprint_nodes` now returns `graph_path` + `node_guid` + `current_asset` per entry; new `anim_reassign_asset(from, to, graph_filter)` for by-value asset rewrite across an AnimBP. |
 | 2026-Q2 | **Companion v1.12.0** | Eight spec requests in one drop: BP variable lifecycle (`bp_variable_remove_direct` / `_rename_atomic` / `_retype` — surgical, atomic, no collateral), SkeletalMesh socket authoring + read fixes (`mesh_socket_add` sets parent bone; helper switched to public socket-by-index API), SCS typed property setter (`bp_set_component_property_typed`), runtime PIE invoke (`runtime_invoke`), Enhanced Input + raw key injection (`pie_input_inject`), single-node inspect (`bp_node_inspect_by_guid`), `LoadAssetWithFallback` (defensive AssetRegistry path when EAL goes blind in 5.7.4), AnimMontage clip-swap regression fix (`FArchiveReplaceObjectRef` sweep across the duplicated montage). Build.cs picks up `AssetRegistry`, `EditorScriptingUtilities`, `InputCore`. |
 | 2026-Q2 | **Companion v1.11.1** | Two v1.11.0 bug fixes. `anim_node_add` couldn't return the guid for `AnimGraphNode_ControlRig` (and other subclasses that don't expose NodeGuid as a Python attribute) — the node WAS created; only the readback failed. Switched to the companion `get_node_guid` binding. Docstring/example path corrected: Control Rig anim node is `/Script/ControlRigDeveloper.AnimGraphNode_ControlRig`. `anim_node_expose_pin` couldn't toggle Control Rig rig variables because `UAnimGraphNode_CustomProperty` subclasses store bindable-variable pins in `CustomPinProperties`, not `ShowPinForProperties`. Now walks both via `FArrayProperty` reflection. New `anim_node_list_exposable_pins` enumerates both lists with `source` tags so callers can discover the bindable surface. |
