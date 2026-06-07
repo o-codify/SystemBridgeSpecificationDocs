@@ -2,7 +2,7 @@
 id: systembridge-overview
 title: SystemBridge — Overview
 status: stable
-version: 26.606.219
+version: 26.607.1733
 tags: [ overview, index ]
 ---
 
@@ -143,6 +143,9 @@ Three loosely-coupled goals:
 - "Inspect ONE node's pins in a 600-node event graph without dumping the whole graph." →
   [blueprint authoring → single-node inspection](unreal/blueprint-authoring.md#single-node-inspection--bp_node_inspect_by_guid)
   → `bp_node_inspect_by_guid`.
+- "Who breaks if I rename this asset?" or "every DataTable in the project" — fast project-wide audits without spending minutes on editor RPC. →
+  [bulk offline scanner](unreal/bulk-offline-scanner.md)
+  → `assets_find_references` / `assets_find_by_class` / `assets_scan_offline`.
 
 ## Repository
 
