@@ -2,7 +2,7 @@
 id: changelog
 title: Changelog
 status: stable
-version: 26.607.2122
+version: 26.607.2220
 tags: [ changelog ]
 ---
 
@@ -22,6 +22,7 @@ also captured in [companion plugin reference](unreal/companion.md).
 
 | Date | Tag | What |
 |---|---|---|
+| 2026-Q2 | **sb-unreal v1.14.0** | Sequencer (Level Sequence) authoring — 10 tools closing the last big read+write coverage gap. Read: `sequencer_bindings_list` / `sequencer_tracks_list` / `sequencer_track_info` / `sequencer_keys_list`. Write: `sequencer_track_add` / `sequencer_track_remove` / `sequencer_section_add` / `sequencer_key_add` / `sequencer_key_remove` / `sequencer_binding_add`. Pure Python via UE 5.7's `MovieSceneScriptingChannel` API — typed key channels reachable from Python without a companion C++ bump. Vocab kept short: track_class accepts `transform / float / bool / integer / byte / vector / color / event / audio / camera_cut / anim / subscene / actor_ref`. Closes the sequencer-authoring spec request. |
 | 2026-Q2 | **Companion v1.12.3** | BP compiled bytecode inspector — `bp_function_bytecode(bp_path, function_name)` returns line-by-line disassembly. Covers ~80 common EX_* opcodes; unknown ones as `EX_0xNN (raw)`. Diagnoses 'graph looks right but runtime is wrong' cases. Closes the bp-compiled-bytecode-inspector roadmap request. |
 | 2026-Q2 | **Companion v1.13.1** | Macros + interface impl + function locals — 8 new tools closing three Blueprint authoring gaps that real projects hit. Macros: `bp_macros_list` / `bp_macro_create` / `bp_node_macro_instance_target`. Interface implementation: `bp_interfaces_list` / `bp_interface_add` (idempotent) / `bp_interface_remove`. Function locals: `bp_function_locals_list` / `bp_function_local_add`. |
 | 2026-Q2 | **Companion v1.13.0** | AnimGraph state machine authoring — six tools (states list / add state / add conduit / add transition / entry state / inner graph). Closes the biggest remaining AnimGraph gap. Transition rule authoring deferred. |
