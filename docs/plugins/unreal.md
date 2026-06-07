@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.607.1717
+version: 26.607.1731
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -306,6 +306,14 @@ Linking pose AND data pins reuses `bp_node_link_pins` / `bp_node_break_link` / `
 | `anim_reassign_asset` | **v1.12.1+** | By-value asset reassignment in an AnimBP: walks every `AnimGraphNode_*` whose inner `FAnimNode_*` references `from_asset` and rewrites to `to_asset`. Optional `graph_filter` substring scopes to one state-machine graph. Returns per-node trail. |
 | `asset_version_info` | **v1.12.2+** | Saved engine version + custom-version container + warnings for an asset. Diagnoses 'why won't this load' failures (engine-skew, custom-version mismatch). |
 | `asset_metadata` | **v1.12.2+** | Per-object metadata key-value pairs for the asset + its immediate subobjects (`UMetaData::GetMapForObject`). Author-time hints, tooltips, categories. |
+
+### Bulk offline scanner (no editor)
+
+| Tool | Companion | Purpose |
+|---|---|---|
+| `assets_find_references` | none | List every asset whose import table references `target_path`. Walks /Game/** uassets on disk. 1000-asset project in 1-3s. Refactor planning. |
+| `assets_find_by_class` | none | List every asset whose top-level export class matches any candidate (short name or full path). "all DataTables", "all AnimBPs" audits. |
+| `assets_scan_offline` | none | Project-wide audit: class histogram + engine-family histogram + top 20 referenced packages. Diagnose project structure. |
 
 ## SB_JSON marker protocol
 
