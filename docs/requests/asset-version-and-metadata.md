@@ -2,7 +2,7 @@
 id: request-asset-version-metadata-diagnostics-asset-version-info-level-as-data
 title: "Request: asset version + metadata diagnostics (`asset_version_info`, level-as-data)"
 status: request
-version: 26.607.1704
+version: 26.607.1717
 tags: [ unreal, diagnostic, metadata, level, request ]
 ---
 
@@ -14,6 +14,12 @@ SystemBridge currently surfaces none of these — `asset_describe` gives
 top-level UPROPERTYs only.
 
 Three small diagnostic tools, low-effort, high-value.
+
+## Status (2026-Q2)
+
+- ✅ `asset_version_info` — shipped in **v1.12.2**.
+- ✅ `asset_metadata` — shipped in **v1.12.2**.
+- ⏳ `level_actors_offline` — deferred to the bulk-offline-scanner work item (same offline-file-parser infrastructure).
 
 ## 1. `asset_version_info(asset_path)`
 
