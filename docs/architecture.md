@@ -2,7 +2,7 @@
 id: architecture
 title: Architecture
 status: stable
-version: 26.601.1817
+version: 26.608.1930
 tags: [ architecture, internals ]
 ---
 
@@ -17,29 +17,32 @@ See also: [overview](README.md), [installation](installation.md),
 
 ## Layers
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│  AI agent (Claude Code, Claude Desktop, any MCP client)      │
-└───────────────────────┬──────────────────────────────────────┘
-                        │  MCP / stdio (JSON-RPC)
-┌───────────────────────▼──────────────────────────────────────┐
-│  sb.exe — core                                               │
-│   • plugin discovery (manifests + triggers)                  │
-│   • tool routing (tool name → plugin)                        │
-│   • discover() aggregation                                   │
-│   • permissions / consent / .senseignore                     │
-│   • event ring per plugin (warn/error history)               │
-│   • global config + secrets                                  │
-└───────────────────────┬──────────────────────────────────────┘
-                        │  stdio (one pipe pair per plugin)
-        ┌───────────────┼───────────────┬──────────────┐
-        ▼               ▼               ▼              ▼
-   files.exe      unreal.exe       git.exe        process.exe  …
-   (plugin)       (plugin)         (plugin)       (plugin)
-                        │
-                        │  UE Python Remote Execution (UDP/TCP)
-                        ▼
-                  UnrealEditor.exe (project + companion DLL)
+```mermaid
+flowchart TD
+  AI["AI agent\nClaude Code / Claude Desktop / any MCP client"]
+  subgraph Core["sb.exe — core"]
+    Disc[plugin discovery\nmanifests + triggers]
+    Route[tool routing\ntool name → plugin]
+    Discover["discover() aggregation"]
+    Perm[permissions / consent / .senseignore]
+    Ring[event ring per plugin\nwarn/error history]
+    Cfg[global config + secrets]
+  end
+  subgraph Plugins["plugin processes — one stdio pipe pair each"]
+    Files[files.exe]
+    Unreal[unreal.exe]
+    Git[git.exe]
+    Proc[process.exe]
+    More[... 15 more]
+  end
+  Editor["UnrealEditor.exe\nproject + companion DLL"]
+  AI <-- MCP / stdio JSON-RPC --> Core
+  Core <-- stdio --> Files
+  Core <-- stdio --> Unreal
+  Core <-- stdio --> Git
+  Core <-- stdio --> Proc
+  Core <-- stdio --> More
+  Unreal <-- UE Python Remote Execution\nUDP / TCP --> Editor
 ```
 
 ## Core (`sb.exe`)
@@ -96,12 +99,19 @@ Per-plugin details: [plugins/index.md](plugins/index.md).
 Each plugin process is started with stdio pipes. It implements the **MCP
 protocol** as a server; core acts as the client. The agent's call flow:
 
-```
-agent → core: tools/call { name: "unreal_pie_start", args: { mode: "PIE" } }
-core  → unreal plugin: tools/call { name: "pie_start", args: { mode: "PIE" } }
-unreal plugin → UE editor (Python Remote Execution): runs helper script
-unreal plugin → core: { content: [{ type: "text", text: <json> }] }
-core  → agent: same envelope
+```mermaid
+sequenceDiagram
+  participant Agent as AI agent
+  participant Core as sb.exe
+  participant Plugin as unreal plugin
+  participant Editor as UE editor
+  Agent->>Core: tools/call { name: "unreal_pie_start", args: {mode: "PIE"} }
+  Note over Core: strip plugin prefix\nlookup owner
+  Core->>Plugin: tools/call { name: "pie_start", args: {mode: "PIE"} }
+  Plugin->>Editor: Python Remote Execution\nruns helper script
+  Editor-->>Plugin: stdout + parsed_json marker
+  Plugin-->>Core: { content: [{type: "text", text: <json>}] }
+  Core-->>Agent: same envelope
 ```
 
 Tool names are namespaced in the surface visible to the agent but the plugin
@@ -160,26 +170,35 @@ manifest.Manifest{
 
 ## Lifecycle
 
-```
-sb start
-  └─ scan cwd for triggers
-  └─ load matching plugin manifests
-  └─ spawn each plugin process, hold stdio pipes
-  └─ MCP server: tools list = union of all plugins' tools
-
-discover() called
-  └─ for each plugin: get Summary (cached up to SummaryCacheSeconds)
-  └─ collect events from each plugin's ring (drain)
-  └─ return combined map { plugin_name: { summary, events } }
-
-tools/call <name>
-  └─ route to plugin
-  └─ enforce per-tool permission gates
-  └─ stream progress notifications back (long-running build/test/PIE)
-
-sb exit
-  └─ Job Object (Windows) terminates all child plugin processes
-  └─ each plugin runs its defer cleanup (e.g. python wrapper pool stop)
+```mermaid
+flowchart TD
+  subgraph Start["sb start"]
+    S1[scan cwd for triggers]
+    S2[load matching plugin manifests]
+    S3[spawn each plugin process,\nhold stdio pipes]
+    S4["MCP server up — tools list =\nunion of all plugins' tools"]
+    S1 --> S2 --> S3 --> S4
+  end
+  subgraph Discover["discover() called"]
+    D1[for each plugin: get Summary\ncached up to SummaryCacheSeconds]
+    D2[collect events from each plugin's\nring buffer — drain]
+    D3["return combined map\n{ plugin_name: { summary, events } }"]
+    D1 --> D2 --> D3
+  end
+  subgraph Call["tools/call &lt;name&gt;"]
+    C1[route to plugin]
+    C2[enforce per-tool permission gates]
+    C3[stream progress notifications back\nlong-running build/test/PIE]
+    C1 --> C2 --> C3
+  end
+  subgraph Exit["sb exit"]
+    E1["Job Object (Windows) terminates\nall child plugin processes"]
+    E2["each plugin runs its defer cleanup\n(e.g. python wrapper pool stop)"]
+    E1 --> E2
+  end
+  Start --> Discover
+  Discover --> Call
+  Call --> Exit
 ```
 
 ## Project-rooted by design
