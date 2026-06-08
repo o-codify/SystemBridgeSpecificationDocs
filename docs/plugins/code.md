@@ -2,7 +2,7 @@
 id: plugin-code
 title: "Plugin: code"
 status: stable
-version: 26.608.1654
+version: 26.608.1923
 tags: [ plugin, code, lsp, gopls, definition, references ]
 ---
 
@@ -41,6 +41,30 @@ on demand.
 
 Diagnostics are pushed by the server (notification) and stashed per
 URI; `code.diagnostics` returns the most recent set.
+
+```mermaid
+sequenceDiagram
+  participant AI
+  participant Plugin as sb-code
+  participant Mgr as serverManager
+  participant Gopls as gopls
+  AI->>Plugin: code.definition(file, line, col)
+  Plugin->>Mgr: getServer(file)
+  alt server cached
+    Mgr-->>Plugin: *lspClient (existing)
+  else cold start
+    Mgr->>Gopls: spawn gopls (stdin/stdout pipes)
+    Plugin->>Gopls: initialize { rootUri, capabilities }
+    Gopls-->>Plugin: capabilities
+    Plugin->>Gopls: initialized notification
+  end
+  Plugin->>Gopls: textDocument/didOpen { uri, text }
+  Plugin->>Gopls: textDocument/definition { uri, position }
+  Gopls-->>Plugin: Location[] or LocationLink[]
+  Plugin->>Plugin: parseLocations (variant shapes)
+  Plugin-->>AI: [{file, line, col, content_preview}]
+  Note over Gopls,Plugin: diagnostics pushed asynchronously\nstashed by URI for code.diagnostics
+```
 
 ## Coordinate convention
 
