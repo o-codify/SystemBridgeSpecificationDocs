@@ -2,7 +2,7 @@
 id: plugin-db
 title: "Plugin: db"
 status: stable
-version: 26.608.1653
+version: 26.608.1925
 tags: [ plugin, db, postgres, mysql, sqlite, redis ]
 ---
 
@@ -10,6 +10,38 @@ tags: [ plugin, db, postgres, mysql, sqlite, redis ]
 
 SQL (PostgreSQL / MySQL / SQLite) + Redis query and introspection. AI
 doesn't have to shell out to `psql` / `sqlite3` / `redis-cli`.
+
+## Connection resolution
+
+```mermaid
+flowchart TD
+  call[db.query / schema / redis_*] --> conn{conn arg shape?}
+  conn -- contains : --> raw[treat as DSN]
+  conn -- bare name --> alias[lookup in\n~/.systembridge/db_conns.toml]
+  alias --> aliasOk{found?}
+  aliasOk -- no --> err[validation_failed:\nunknown alias]
+  aliasOk -- yes --> raw
+  raw --> detect{prefix?}
+  detect -- postgres:// --> pg[(pgx driver)]
+  detect -- mysql:// --> my[(go-sql-driver)]
+  detect -- sqlite: / file: --> lite[(modernc.org/sqlite)]
+  detect -- redis:// / rediss:// --> red[(go-redis client)]
+  detect -- ends with .db/.sqlite --> lite
+  pg --> cached[sqlCache by dialect+DSN]
+  my --> cached
+  lite --> cached
+  red --> redisCache[redisCache by DSN]
+  cached --> exec[ctx-bounded Query/Exec\n5s default timeout]
+  redisCache --> exec
+  exec --> rows[scan rows\n1000-row cap]
+  rows --> trunc{rows_truncated?}
+  trunc -- yes --> respTrunc[response with\nrows_truncated: true]
+  trunc -- no --> resp[response]
+```
+
+DSN with embedded password is **never** logged or returned — only the
+alias name appears in the audit log. `db.conns_list` redacts the
+password via `dsnPwRe`.
 
 ## Connection strings
 
