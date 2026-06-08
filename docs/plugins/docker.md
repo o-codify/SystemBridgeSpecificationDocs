@@ -2,7 +2,7 @@
 id: plugin-docker
 title: "Plugin: docker"
 status: stable
-version: 26.608.1653
+version: 26.608.1923
 tags: [ plugin, docker, containers, compose ]
 ---
 
@@ -63,6 +63,29 @@ running (rather than crashing).
 - `compose_*` refuses if the compose file resolves outside `cwd`.
 - Plugin starts cleanly when Docker daemon isn't running; tools return
   `docker_unavailable` (errcodes-typed) instead of crashing.
+
+## Architecture
+
+```mermaid
+flowchart LR
+  AI[AI agent]
+  subgraph Plugin[sb-docker]
+    H[handlers.go]
+    Compose[compose.go\nsubprocess wrapper]
+  end
+  subgraph Daemon[Docker daemon]
+    Containers[containers]
+    Images[images]
+    Volumes[volumes]
+    Networks[networks]
+  end
+  Cli[docker compose CLI]
+  AI -- docker.ps / inspect / logs / exec --> H
+  AI -- docker.compose_up / down / ps --> Compose
+  H -- SDK REST\nunix or npipe --> Daemon
+  Compose -- subprocess --> Cli
+  Cli -- SDK REST --> Daemon
+```
 
 ## Implementation notes
 
