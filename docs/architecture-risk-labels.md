@@ -2,7 +2,7 @@
 id: architecture-risk-labels-on-write-tools
 title: "Architecture: risk labels on write tools"
 status: stable
-version: 26.608.1655
+version: 26.608.1922
 tags: [ architecture, risk, manifest, safety ]
 ---
 
@@ -16,6 +16,27 @@ confirmation on high.
 Coarser-grained than per-call introspection (we don't try to derive
 risk from arguments — "would `rm -rf /tmp/foo` vs `/etc/passwd` be
 different?") and finer than the binary `write_*` permission gate.
+
+## Decision flow at the AI client
+
+```mermaid
+flowchart TD
+  call[AI invokes a tool] --> hasRisk{tool has\nrisk_level?}
+  hasRisk -- no / empty --> readOnly[read-only path: allow]
+  hasRisk -- yes --> level{risk_level}
+  level -- low --> autoAllow[auto-allow]
+  level -- medium --> promptUser[prompt user once]
+  level -- high --> requireConfirm[require explicit confirm]
+  autoAllow --> dispatch[dispatch tool]
+  promptUser -->|accept| dispatch
+  promptUser -->|reject| denied[user_canceled error]
+  requireConfirm -->|accept| dispatch
+  requireConfirm -->|reject| denied
+```
+
+The SB core does **not** implement the confirm policy itself — it exposes
+`risk_level` and lets the AI client decide. SB only enforces the
+binary `write_*` permission gate.
 
 ## Vocabulary
 
