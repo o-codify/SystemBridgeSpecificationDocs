@@ -2,7 +2,7 @@
 id: plugin-files
 title: "Plugin: files"
 status: stable
-version: 26.601.1817
+version: 26.608.2205
 tags: [ plugin, files ]
 ---
 
@@ -213,3 +213,65 @@ agent uses `tree` for deeper navigation.
 - **"Show me the function signatures in foo.go."** → `outline`.
 - **"Refactor a constant across 6 files."** → `search.grep` to find →
   `read_many` to confirm context → `edit` per file.
+
+## Binary + archive inspection
+
+Added so AI doesn't have to shell out to `strings` / `file` / `unzip -l` /
+`tar -tzf`.
+
+### `binary_strings`
+
+Extract printable strings (ASCII + UTF-16 LE) from any binary file. Unix
+`strings` equivalent. Useful for finding embedded text inside `.exe` /
+`.dll` / `.uasset` / `.so` / `.dylib`: version stamps, asset paths, error
+messages, embedded scripts.
+
+Returns `{count, total_found, strings: [{offset, text, encoding}]}` ordered
+by file offset.
+
+Args:
+
+- `path` — required.
+- `min_len` — default 4.
+- `limit` — default 200, max 5000.
+- `contains` — optional substring filter.
+- `encoding` — `ascii` (default) / `utf16le` / `both`.
+
+File-size cap: 200 MB.
+
+### `binary_format`
+
+Detect format by magic bytes. Cross-platform replacement for Unix `file`.
+Returns `{kind, mime, confidence, details}`.
+
+Recognises: PE (.exe/.dll with arch detection), ELF (with class+endian),
+Mach-O, ZIP (and subtypes: jar / docx / xlsx / pptx / apk / ooxml), TAR,
+GZIP, PNG (with width+height), JPG, GIF, WEBP, BMP, PDF, .uasset / .umap,
+SQLite, plain text.
+
+### `archive_list`
+
+List entries in `.zip` / `.tar` / `.tar.gz` / `.tgz` archives without
+extracting. Returns `{format, count, entries: [{path, size, mode, mtime,
+is_dir}]}`. Caps at 5000 entries.
+
+### `archive_extract`
+
+Extract one entry (`member`) or the whole archive to `dest`. **Risk:
+medium.** Gated by `write_files`. Safe-path checks reject any entry whose
+resolved path escapes `dest` — classic zip-slip protection.
+
+## Risk-labelled writes
+
+The `files` plugin's write surface uses the standard
+[risk-label vocabulary](../architecture-risk-labels.md):
+
+| Tool | Risk |
+|---|---|
+| `append` | low |
+| `create_dir` | low |
+| `write` | medium |
+| `edit` | medium |
+| `move` | medium |
+| `archive_extract` | medium |
+| `delete` | **high** |

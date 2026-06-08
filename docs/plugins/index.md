@@ -2,7 +2,7 @@
 id: plugins-index
 title: Plugins — Index
 status: stable
-version: 26.601.1817
+version: 26.608.2205
 tags: [ plugins, index ]
 ---
 
@@ -43,6 +43,15 @@ process slots + keeps the agent's tool list focused.
 | `clipboard` | [#clipboard](#clipboard) | `read`/`write` text, image, and BP-node-template variants |
 | `screenshot` | [#screenshot](#screenshot) | `capture` (per-display) |
 | `cpp` | [#cpp](#cpp) | header dependency graph, include analysis |
+| `config` | [config](config.md) | format-aware JSON / YAML / TOML / INI editing by dotted path |
+| `db` | [db](db.md) | PostgreSQL / MySQL / SQLite + Redis query and introspection |
+| `docker` | [docker](docker.md) | container lifecycle + images / volumes / networks + compose |
+| `scrape` | [scrape](scrape.md) | chromedp + html-to-markdown + readability + crawl |
+| `semantic` | [semantic](semantic.md) | BM25 + identifier-aware code search (per-project SQLite index) |
+| `build` | [build](build.md) | auto-detect Go / Node / Rust / Python / Make: build/test/lint/format/deps |
+| `code` | [code](code.md) | LSP bridge (v0.1 gopls): definition / references / hover / diagnostics |
+| `github` | [github](github.md) | gh CLI wrapper: 40 tools for PR / issue / CI / release / search |
+| `research` | [research](research.md) | StackOverflow / HackerNews / Wikipedia / npm / PyPI / crates / go.dev |
 
 ---
 
