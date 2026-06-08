@@ -2,7 +2,7 @@
 id: architecture-mcp-self-introspection
 title: "Architecture: MCP self-introspection"
 status: stable
-version: 26.608.1656
+version: 26.608.1922
 tags: [ architecture, mcp, introspection, doctor ]
 ---
 
@@ -12,6 +12,35 @@ Core-level `mcp.*` and `doctor.*` tools — diagnostics and discovery for
 the MCP topology itself. Lives in `cmd/sb/` (not as a plugin) because
 the data lives in core: `pluginhost.Host` owns the plugin registry,
 the audit logger owns the log file.
+
+```mermaid
+flowchart LR
+  AI[AI agent]
+  subgraph Core[sb.exe core]
+    Mcp[mcp.* tools]
+    Doctor[doctor.* tools]
+    Host[pluginhost.Host\nplugin registry]
+    Audit[audit.Logger\n~/.systembridge/logs/audit.log]
+  end
+  subgraph Plugins[plugin processes]
+    P1[sb-files]
+    P2[sb-unreal]
+    Pn[sb-... 17 more]
+  end
+  AI -- mcp.servers_list --> Mcp
+  AI -- mcp.tools_list --> Mcp
+  AI -- mcp.call --> Mcp
+  AI -- mcp.audit_search --> Mcp
+  AI -- doctor.run --> Doctor
+  Mcp --> Host
+  Mcp --> Audit
+  Doctor -- regen manifest.json --> P1
+  Host --- P1
+  Host --- P2
+  Host --- Pn
+  P1 -- CallTool record --> Audit
+  P2 -- CallTool record --> Audit
+```
 
 Filed because v1.14.0 hotfix loop required hand-crafting JSON-RPC to
 `sb.exe`'s stdin to verify a fix end-to-end. That should be a tool, not
