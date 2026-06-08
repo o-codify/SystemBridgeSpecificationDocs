@@ -2,7 +2,7 @@
 id: architecture-structured-error-codes
 title: "Architecture: structured error codes"
 status: stable
-version: 26.608.1655
+version: 26.608.1922
 tags: [ architecture, errors, errcodes ]
 ---
 
@@ -40,6 +40,45 @@ Default `recoverable` flag per code (overridable via
 
 ## Wire shape
 
+```mermaid
+classDiagram
+  class Error {
+    +Code error_code
+    +string message_for_user
+    +string message_for_ai
+    +string suggested_action
+    +bool recoverable
+    +string cause
+    +map context
+    +WithUserMessage(s) Error
+    +WithSuggestedAction(s) Error
+    +WithRecoverable(b) Error
+    +WithCause(s) Error
+    +WithContext(kv) Error
+    +ToMCPResult() CallToolResult
+  }
+  class Code {
+    <<enumeration>>
+    not_found
+    permission_denied
+    auth_missing
+    auth_insufficient
+    auth_expired
+    validation_failed
+    rate_limited
+    network
+    timeout
+    conflict
+    internal_error
+    unsupported_op
+    user_canceled
+    plugin_unavailable
+  }
+  Error --> Code : error_code
+```
+
+Example JSON body the AI sees in `CallToolResult.content[0].text`:
+
 ```json
 {
   "error_code": "auth_missing",
@@ -56,6 +95,21 @@ Default `recoverable` flag per code (overridable via
 `message_for_ai` is what the AI sees in the tool result.
 `suggested_action` is action-oriented ("re-auth via `gh auth login`")
 not just descriptive.
+
+## Error flow (sb-github example)
+
+```mermaid
+sequenceDiagram
+  participant AI
+  participant Plugin as sb-github
+  participant Gh as gh CLI
+  AI->>Plugin: github.pr_read({number: 42})
+  Plugin->>Gh: gh pr view 42 --json ...
+  Gh-->>Plugin: exit 1, stderr="not authenticated"
+  Plugin->>Plugin: mapGhError(stderr)
+  Plugin-->>AI: { isError: true,\nerror_code: auth_missing,\nrecoverable: false,\nsuggested_action: "Run gh auth login" }
+  Note over AI: switch on error_code, not on text
+```
 
 ## Construction (Go side)
 
