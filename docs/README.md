@@ -2,7 +2,7 @@
 id: systembridge-overview
 title: SystemBridge — Overview
 status: stable
-version: 26.607.1733
+version: 26.608.1659
 tags: [ overview, index ]
 ---
 
@@ -10,8 +10,11 @@ tags: [ overview, index ]
 
 A local MCP daemon that gives an AI coding agent structured, token-efficient
 access to a developer's environment — files, git, processes, the browser, the
-running editor, and (deeply) Unreal Engine — through 12+ specialized plugins
-and a thin core that owns lifecycle, discovery, consent, and events.
+running editor, databases, containers, GitHub, CI / build / test / lint, LSP
+code intel, web scraping, semantic code search, research backends, and
+(deeply) Unreal Engine — through **19 specialized plugins** and a thin core
+that owns lifecycle, discovery, consent, events, structured errors, risk
+labels, and watchers.
 
 The agent talks to one MCP endpoint (`sb.exe`). `sb` spawns per-capability
 plugin processes via stdio, exposes their tools, and aggregates a low-cost
@@ -33,8 +36,16 @@ every turn.
   lifecycle, permissions, events.
 - [Installation](installation.md) — `sb install`, Claude Code wiring, embedded
   skill, PATH propagation.
-- [Plugins](plugins/index.md) — registry of all 12 plugins, summary tables,
+- [Plugins](plugins/index.md) — registry of all 19 plugins, summary tables,
   per-plugin pages.
+- [Architecture: structured error codes](architecture-errcodes.md) — typed
+  `errcodes` vocabulary shared across plugins.
+- [Architecture: risk labels](architecture-risk-labels.md) — low / medium /
+  high on write tools, surfaced via `mcp.tools_list`.
+- [Architecture: watch / streaming](architecture-watch.md) — long-running
+  observer convention + `watch.list/poll/stop/status` core tools.
+- [Architecture: MCP introspection](architecture-mcp-introspection.md) —
+  `mcp.*` + `doctor.*` for self-introspection and health.
 - [Unreal deep dive](unreal/index.md) — the largest plugin surface, with its
   C++ companion sub-plugin, headless Blueprint authoring, PIE lifecycle, Live
   Coding, crash recovery, and the editor Message Log.
