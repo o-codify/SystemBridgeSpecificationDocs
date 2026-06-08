@@ -2,7 +2,7 @@
 id: plugin-research
 title: "Plugin: research"
 status: stable
-version: 26.608.1655
+version: 26.608.1925
 tags: [ plugin, research, stackoverflow, wikipedia, npm, pypi ]
 ---
 
@@ -55,6 +55,40 @@ Each adapter honours the source's documented limit:
 
 A 429 maps to `errcodes.RateLimited` (recoverable) with a "back off"
 suggestion.
+
+## Adapter dispatch
+
+```mermaid
+flowchart LR
+  AI[AI agent] --> dispatch{tool}
+  dispatch -- research.stackoverflow --> so[api.stackexchange.com\n/2.3/search/advanced]
+  dispatch -- research.hackernews --> hn[hn.algolia.com\n/api/v1/search]
+  dispatch -- research.wikipedia --> wiki[en.wikipedia.org\n/w/api.php + /api/rest_v1]
+  dispatch -- research.npm --> npm[registry.npmjs.org]
+  dispatch -- research.pypi --> pypi[pypi.org/pypi/PKG/json]
+  dispatch -- research.crates --> crates[crates.io/api/v1/crates]
+  dispatch -- research.godoc --> godoc[proxy.golang.org/IP/@v/list]
+  so --> shared[httpGetJSON\n10s timeout +\n10MB body cap]
+  hn --> shared
+  wiki --> shared
+  npm --> shared
+  pypi --> shared
+  crates --> shared
+  godoc --> shared
+  shared --> status{HTTP status?}
+  status -- 200 --> parse[json.Decode]
+  status -- 404 --> nf[errcodes.NotFound]
+  status -- 429 --> rl[errcodes.RateLimited\n+ Recoverable: true\n+ SuggestedAction: back off]
+  status -- 4xx/5xx --> ie[errcodes.InternalError]
+  status -- transport fail --> net[errcodes.Network\n+ Recoverable: true]
+  parse --> shape[uniform {source, query, hits[]} shape]
+  parse -- decode error --> ie
+  shape --> AI
+  nf --> AI
+  rl --> AI
+  ie --> AI
+  net --> AI
+```
 
 ## Errors
 
