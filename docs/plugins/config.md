@@ -2,7 +2,7 @@
 id: plugin-config
 title: "Plugin: config"
 status: stable
-version: 26.608.1652
+version: 26.608.1925
 tags: [ plugin, config, json, yaml, toml, ini ]
 ---
 
@@ -32,12 +32,36 @@ construction.
 
 Shared across all four formats:
 
+| Form | Meaning |
+|---|---|
+| `a.b.c` | nested keys |
+| `a.b[0]` | array index |
+| `a."key.with.dots".b` | quoted key (for keys containing dots) |
+| `[0][1]` | nested array |
+
+## Pipeline
+
+```mermaid
+flowchart LR
+  call[config.set] --> detect{detect\nformat}
+  detect -- override --> fmt[json / yaml / toml / ini]
+  detect -- by ext --> fmt
+  detect -- content sniff --> fmt
+  fmt --> load[parse via format library]
+  load --> parsePath[parsePath dotted path]
+  parsePath --> mutate[set / unset / merge\nin value tree]
+  mutate --> ser[marshal back\nthrough format library]
+  ser --> tmp[write .config-RAND.tmp]
+  tmp --> sync[fsync]
+  sync --> rename[os.Rename atomic]
+  rename --> done[file replaced]
+  load -- parse error --> fail[return error,\nfile untouched]
+  ser -- marshal error --> fail
 ```
-a.b.c                   nested keys
-a.b[0]                  array index
-a."key.with.dots".b     quoted key (for keys containing dots)
-[0][1]                  nested array
-```
+
+Atomicity invariant: if **any** step fails between parse and rename,
+the original file is bitwise unchanged — a half-written config is
+impossible by construction.
 
 ## Examples
 
