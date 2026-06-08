@@ -2,7 +2,7 @@
 id: architecture-watch-streaming-pattern
 title: "Architecture: watch / streaming pattern"
 status: stable
-version: 26.608.1656
+version: 26.608.1922
 tags: [ architecture, watch, streaming, events ]
 ---
 
@@ -15,11 +15,28 @@ arrive**.
 
 ## Convention
 
-1. A plugin starts a watcher and returns `{watch_id}` immediately.
-2. The watcher goroutine emits events via `w.Emit(kind, payload)`.
-3. AI polls via `watch.poll(watch_id, since_cursor?, max?)` to drain
-   events since the last cursor.
-4. AI calls `watch.stop(watch_id)` to terminate.
+```mermaid
+sequenceDiagram
+  participant AI
+  participant Core as sb.exe
+  participant Plugin
+  participant W as Watcher goroutine
+  AI->>Plugin: github.run_watch(id=42)
+  Plugin->>Core: watch.Register(source, label, stopFn)
+  Core-->>Plugin: *Watcher (id=watch_a1b2)
+  Plugin->>W: go observe()
+  Plugin-->>AI: { watch_id: "watch_a1b2" }
+  loop until done
+    W->>Core: w.Emit("step_started", payload)
+    AI->>Core: watch.poll(id, since_cursor)
+    Core-->>AI: { events, next_cursor, cancelled }
+  end
+  AI->>Core: watch.stop(id)
+  Core->>W: stopFn() → cancel
+  Core->>Core: w.Cancelled.Store(true)
+  AI->>Core: watch.poll(id, last)
+  Core-->>AI: { events: [], cancelled: true }
+```
 
 Buffer caps at **1000 events** per watcher (oldest dropped if full).
 
