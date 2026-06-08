@@ -2,7 +2,7 @@
 id: architecture
 title: Architecture
 status: stable
-version: 26.608.1930
+version: 26.608.2149
 tags: [ architecture, internals ]
 ---
 
@@ -42,7 +42,7 @@ flowchart TD
   Core <-- stdio --> Git
   Core <-- stdio --> Proc
   Core <-- stdio --> More
-  Unreal <-- UE Python Remote Execution\nUDP / TCP --> Editor
+  Unreal <-- "UE Python Remote Execution<br/>UDP / TCP" --> Editor
 ```
 
 ## Core (`sb.exe`)
@@ -106,9 +106,9 @@ sequenceDiagram
   participant Plugin as unreal plugin
   participant Editor as UE editor
   Agent->>Core: tools/call { name: "unreal_pie_start", args: {mode: "PIE"} }
-  Note over Core: strip plugin prefix\nlookup owner
+  Note over Core: strip plugin prefix<br/>lookup owner
   Core->>Plugin: tools/call { name: "pie_start", args: {mode: "PIE"} }
-  Plugin->>Editor: Python Remote Execution\nruns helper script
+  Plugin->>Editor: Python Remote Execution<br/>runs helper script
   Editor-->>Plugin: stdout + parsed_json marker
   Plugin-->>Core: { content: [{type: "text", text: <json>}] }
   Core-->>Agent: same envelope
