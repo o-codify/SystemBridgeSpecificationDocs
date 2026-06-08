@@ -2,7 +2,7 @@
 id: plugin-semantic
 title: "Plugin: semantic"
 status: stable
-version: 26.608.1653
+version: 26.608.1923
 tags: [ plugin, semantic, search, bm25, code-search ]
 ---
 
@@ -39,14 +39,43 @@ lemmatisation. Complements grep (literal) and LSP `workspace_symbols`
 
 ## Storage
 
-SQLite at `<project>/.sb_index.sqlite`. Schema:
+SQLite at `<project>/.sb_index.sqlite`.
 
-```
-files       (id, path, sha256, size, mtime_unix, language, indexed_at)
-symbols     (id, file_id, kind, name, line, snippet)
-tokens      (id, symbol_id, token, tf)
-df_tokens   (token PK, df)
-meta        (key PK, value)
+```mermaid
+erDiagram
+  files {
+    integer id PK
+    text    path
+    text    sha256
+    integer size
+    integer mtime_unix
+    text    language
+    integer indexed_at
+  }
+  symbols {
+    integer id PK
+    integer file_id FK
+    text    kind
+    text    name
+    integer line
+    text    snippet
+  }
+  tokens {
+    integer id PK
+    integer symbol_id FK
+    text    token
+    integer tf
+  }
+  df_tokens {
+    text    token PK
+    integer df
+  }
+  meta {
+    text key PK
+    text value
+  }
+  files ||--o{ symbols : contains
+  symbols ||--o{ tokens : has
 ```
 
 BM25 scoring runs in SQL with idf precomputed from `df_tokens`.
