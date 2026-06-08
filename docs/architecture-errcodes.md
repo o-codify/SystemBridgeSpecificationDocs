@@ -2,7 +2,7 @@
 id: architecture-structured-error-codes
 title: "Architecture: structured error codes"
 status: stable
-version: 26.608.1922
+version: 26.608.2149
 tags: [ architecture, errors, errcodes ]
 ---
 
@@ -107,7 +107,7 @@ sequenceDiagram
   Plugin->>Gh: gh pr view 42 --json ...
   Gh-->>Plugin: exit 1, stderr="not authenticated"
   Plugin->>Plugin: mapGhError(stderr)
-  Plugin-->>AI: { isError: true,\nerror_code: auth_missing,\nrecoverable: false,\nsuggested_action: "Run gh auth login" }
+  Plugin-->>AI: { isError: true,<br/>error_code: auth_missing,<br/>recoverable: false,<br/>suggested_action: "Run gh auth login" }
   Note over AI: switch on error_code, not on text
 ```
 
