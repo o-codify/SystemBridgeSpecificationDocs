@@ -2,7 +2,7 @@
 id: systembridge-overview
 title: SystemBridge — Overview
 status: stable
-version: 26.608.1659
+version: 26.608.1925
 tags: [ overview, index ]
 ---
 
@@ -21,13 +21,27 @@ plugin processes via stdio, exposes their tools, and aggregates a low-cost
 `discover()` summary so the agent doesn't have to list-and-stat the world on
 every turn.
 
-```
-   AI agent ── MCP/stdio ──▶  sb.exe (core)
-                                │
-                  ┌─────────────┼─────────────┐
-                  ▼             ▼             ▼
-              files.exe    unreal.exe    git.exe   …
-              (plugin)     (plugin)      (plugin)
+```mermaid
+flowchart LR
+  AI[AI agent]
+  Core[sb.exe core\nlifecycle + manifest +\npermissions + audit + watch]
+  subgraph Plugins[plugin processes - stdio MCP]
+    F[files.exe]
+    U[unreal.exe]
+    G[git.exe]
+    GH[github.exe]
+    DB[db.exe]
+    DK[docker.exe]
+    R[... 13 more]
+  end
+  AI <-- one MCP / stdio endpoint --> Core
+  Core <-- spawn + dispatch --> F
+  Core <-- spawn + dispatch --> U
+  Core <-- spawn + dispatch --> G
+  Core <-- spawn + dispatch --> GH
+  Core <-- spawn + dispatch --> DB
+  Core <-- spawn + dispatch --> DK
+  Core <-- spawn + dispatch --> R
 ```
 
 ## Table of contents
