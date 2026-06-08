@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.607.2219
+version: 26.608.1658
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -349,6 +349,34 @@ to how `bp_node_*` covers Blueprints.
 | `sequencer_key_add` | none | Write a key on a section's channel. Channel FNames vary by track — discover via `sequencer_track_info`. Common: `Location.X/Y/Z`, `Rotation.X/Y/Z`, `Value`, `R/G/B/A`. `interpolation` ∈ {auto, user, break, linear, constant}. |
 | `sequencer_key_remove` | none | Remove every key at the given time on a channel. Idempotent. |
 | `sequencer_binding_add` | none | Bind an existing level actor as a possessable. `actor_path` accepts label or full object path. Returns `binding_guid`. The actor must already exist in the active level. |
+
+### Level actor attach + material connections (v1.15.0)
+
+Pure Python via `EditorActorSubsystem.attach_to_actor` and
+`MaterialEditingLibrary.get_input_connection` — no companion bump.
+
+| Tool | Companion | Purpose |
+|---|---|---|
+| `level_actor_attach` | none | Attach actor to parent (optionally to a named socket). `rule` ∈ snap / keep_world / keep_relative. Idempotent. |
+| `level_actor_detach` | none | Detach from current parent. `rule` ∈ keep_world / keep_relative. |
+| `level_actor_attachments_list` | none | `{parent: {label, socket} \| null, children: [{label, socket}]}`. |
+| `material_expression_pin_links` | none | Connections on one pin: `[{other_guid, other_pin, direction}]`. Mirror of `bp_node_pin_links`. |
+| `material_connections_list` | none | Every edge in the material graph: `[{from_guid, from_pin, to_guid, to_pin}]`. Audit / diff / refactor. |
+
+### Movie Render Queue / World Partition / Niagara / Physics (v1.16.0)
+
+Pure Python; each tool degrades with a structured `*_unavailable` reason
+if its subsystem isn't bound in this engine build.
+
+| Tool | Companion | Purpose |
+|---|---|---|
+| `mrq_preset_create` | none | `UMoviePipelineMasterConfig` asset. Vocab: output_format ∈ png/jpg/bmp/exr/mp4, resolution WIDTHxHEIGHT, sample_count, output_dir. |
+| `mrq_render_submit` | none | Enqueue + start MRQ render of a LevelSequence with a preset via `MoviePipelinePIEExecutor` (in-process). |
+| `mrq_queue_list` | none | Jobs currently in the MRQ. |
+| `world_partition_cells_list` | none | Runtime cells on WP-enabled maps. Returns `not_wp_enabled` typed error otherwise. |
+| `niagara_emitter_list` | none | Emitters on a NiagaraSystem with name + enabled. Module-stack mutation requires companion C++. |
+| `physics_constraint_list` | none | `UPhysicsConstraintComponent`s on an actor with their bound actors. |
+| `physics_constraint_actor_spawn` | none | Spawn a `PhysicsConstraintActor`. Configure ConstraintActor1/2 via `level_actor_set_property`; deep profile (per-axis limits, motors) requires companion C++. |
 
 ### Bulk offline scanner (no editor)
 
