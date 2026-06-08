@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.608.2222
+version: 26.608.2350
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -308,15 +308,23 @@ Linking pose AND data pins reuses `bp_node_link_pins` / `bp_node_break_link` / `
 | `asset_metadata` | **v1.12.2+** | Per-object metadata key-value pairs for the asset + its immediate subobjects (`UMetaData::GetMapForObject`). Author-time hints, tooltips, categories. |
 | `bp_function_bytecode` | **v1.12.3+** | Line-by-line Kismet bytecode disassembly for one BP function. v1.12.5 decodes operands (FProperty names, UFunction names, typed constants, casts, jumps, switch cases). Diagnoses 'graph compiles but runtime is wrong' — self-context bugs become 'EX_LocalOutVariable without preceding EX_Self'. |
 
-### Anim state-machine pose + transition rule (v1.13.2)
+### Anim state-machine pose + transition rule (v1.13.2 + v1.13.3 bug-fix)
 
 Completes the v1.13.0 SM authoring — the always-true transitions and
-empty states are no longer the only option.
+empty states are no longer the only option. v1.13.3 fixed three bugs
+shaken out in live ALS overlay-SM use: a compile-step `TypeError` that
+hid successful edits behind `success:false`, an `enum_value` resolver
+that didn't recognize UserDefinedEnum display names, and — critically —
+a silently-refused enum-byte schema link that left the rule evaluating
+to literal-vs-literal 0==0 (state was unreachable even with the
+"right" rule). See [companion v1.13.3 row](../unreal/companion.md#version-timeline)
+for the full root-cause + fix writeup.
 
 | Tool | Companion | Purpose |
 |---|---|---|
-| `anim_state_machine_set_state_pose` | **v1.13.2+** | Populate a state's inner anim graph with a SequencePlayer wired to the OutputAnimGraphNode Result pin. Replaces any existing anim node. Idempotent. |
-| `anim_state_machine_set_transition_rule_enum_equals` | **v1.13.2+** | Set a transition's boolean rule to `<variable> == <enum>::<value>` (or `!=` if negate). Rebuilds the transition's BoundGraph from scratch — VarGet → EqualEqual_ByteByte ← ByteLiteral → TransitionResult. |
+| `anim_state_machine_set_state_pose` | **v1.13.2+ (fixed v1.13.3)** | Populate a state's inner anim graph with a SequencePlayer wired to the OutputAnimGraphNode Result pin. Replaces any existing anim node. Idempotent. v1.13.3: compile step now uses the UBlueprint (not its EdGraph outer), exception repr truncated to 200 chars with `edit_applied:true` instead of echoing the 381 KB helper source. |
+| `anim_state_machine_set_transition_rule_enum_equals` | **v1.13.2+ (fixed v1.13.3)** | Set a transition's boolean rule to `<variable> == <enum>::<value>` (or `!=` if negate). Rebuilds the transition's BoundGraph from scratch — VarGet → EqualEqual_ByteByte ← ByteLiteral → TransitionResult. v1.13.3: accepts enum value by display name / `NewEnumeratorN` / numeric; stamps `PinSubCategoryObject = EnumObj` on EqualEqual's byte inputs so the K2 schema actually accepts the variable→byte link (without this it silently degraded to literal-vs-literal). |
+| `anim_state_machine_get_transition_rule` | **v1.13.3+** | Read back a transition's rule expression as a pipe-separated descriptor: `{rule_text \| has_var_get \| has_compare \| compare_fn \| enum_path \| enum_value_index \| negated \| wired_to_result}`. Use to verify that `set_transition_rule_enum_equals` actually wired up — debugging-blind was the v1.13.2 pain point. |
 
 ### Macros / interfaces / function locals (v1.13.1)
 
