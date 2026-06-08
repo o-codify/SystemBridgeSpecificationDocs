@@ -2,7 +2,7 @@
 id: plugin-github
 title: "Plugin: github"
 status: stable
-version: 26.608.1655
+version: 26.608.1923
 tags: [ plugin, github, pr, issue, ci, release ]
 ---
 
@@ -82,6 +82,36 @@ the current cwd via `gh repo view --json nameWithOwner`. Pass
 explicitly when working with another repo.
 
 ## Structured errors
+
+```mermaid
+flowchart LR
+  call[github.*] --> spawn["exec gh ..."]
+  spawn --> exit{exit code}
+  exit -- 0 --> ok[parse stdout JSON]
+  exit -- nonzero --> mapErr[mapGhError stderr]
+  mapErr --> contains{"stderr contains..."}
+  contains -- not authenticated --> authMissing[auth_missing]
+  contains -- insufficient scope --> authInsuff[auth_insufficient]
+  contains -- bad credentials / expired --> authExp[auth_expired]
+  contains -- rate limit / abuse --> rate[rate_limited]
+  contains -- not found / 404 --> notFound[not_found]
+  contains -- merge conflict --> conflict[conflict]
+  contains -- branch protection --> permDenied[permission_denied]
+  contains -- network / dial tcp --> network[network]
+  contains -- validation --> validation[validation_failed]
+  contains -- other --> internal[internal_error]
+  ok --> result[CallToolResult OK]
+  authMissing --> result2[ToMCPResult isError true]
+  authInsuff --> result2
+  authExp --> result2
+  rate --> result2
+  notFound --> result2
+  conflict --> result2
+  permDenied --> result2
+  network --> result2
+  validation --> result2
+  internal --> result2
+```
 
 Stderr is mapped to typed `errcodes.Code` via `mapGhError`:
 
