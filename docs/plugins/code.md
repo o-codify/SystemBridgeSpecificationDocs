@@ -2,7 +2,7 @@
 id: plugin-code
 title: "Plugin: code"
 status: stable
-version: 26.608.1923
+version: 26.608.2149
 tags: [ plugin, code, lsp, gopls, definition, references ]
 ---
 
@@ -63,7 +63,7 @@ sequenceDiagram
   Gopls-->>Plugin: Location[] or LocationLink[]
   Plugin->>Plugin: parseLocations (variant shapes)
   Plugin-->>AI: [{file, line, col, content_preview}]
-  Note over Gopls,Plugin: diagnostics pushed asynchronously\nstashed by URI for code.diagnostics
+  Note over Gopls,Plugin: diagnostics pushed asynchronously<br/>stashed by URI for code.diagnostics
 ```
 
 ## Coordinate convention
