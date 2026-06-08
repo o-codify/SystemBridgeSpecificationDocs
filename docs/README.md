@@ -2,7 +2,7 @@
 id: systembridge-overview
 title: SystemBridge — Overview
 status: stable
-version: 26.607.2208
+version: 26.608.2205
 tags: [ overview, index ]
 ---
 
@@ -10,21 +10,38 @@ tags: [ overview, index ]
 
 A local MCP daemon that gives an AI coding agent structured, token-efficient
 access to a developer's environment — files, git, processes, the browser, the
-running editor, and (deeply) Unreal Engine — through 12+ specialized plugins
-and a thin core that owns lifecycle, discovery, consent, and events.
+running editor, databases, containers, GitHub, CI / build / test / lint, LSP
+code intel, web scraping, semantic code search, research backends, and
+(deeply) Unreal Engine — through **19 specialized plugins** and a thin core
+that owns lifecycle, discovery, consent, events, structured errors, risk
+labels, and watchers.
 
 The agent talks to one MCP endpoint (`sb.exe`). `sb` spawns per-capability
 plugin processes via stdio, exposes their tools, and aggregates a low-cost
 `discover()` summary so the agent doesn't have to list-and-stat the world on
 every turn.
 
-```
-   AI agent ── MCP/stdio ──▶  sb.exe (core)
-                                │
-                  ┌─────────────┼─────────────┐
-                  ▼             ▼             ▼
-              files.exe    unreal.exe    git.exe   …
-              (plugin)     (plugin)      (plugin)
+```mermaid
+flowchart LR
+  AI[AI agent]
+  Core[sb.exe core\nlifecycle + manifest +\npermissions + audit + watch]
+  subgraph Plugins[plugin processes - stdio MCP]
+    F[files.exe]
+    U[unreal.exe]
+    G[git.exe]
+    GH[github.exe]
+    DB[db.exe]
+    DK[docker.exe]
+    R[... 13 more]
+  end
+  AI <-- one MCP / stdio endpoint --> Core
+  Core <-- spawn + dispatch --> F
+  Core <-- spawn + dispatch --> U
+  Core <-- spawn + dispatch --> G
+  Core <-- spawn + dispatch --> GH
+  Core <-- spawn + dispatch --> DB
+  Core <-- spawn + dispatch --> DK
+  Core <-- spawn + dispatch --> R
 ```
 
 ## Table of contents
@@ -33,8 +50,16 @@ every turn.
   lifecycle, permissions, events.
 - [Installation](installation.md) — `sb install`, Claude Code wiring, embedded
   skill, PATH propagation.
-- [Plugins](plugins/index.md) — registry of all 12 plugins, summary tables,
+- [Plugins](plugins/index.md) — registry of all 19 plugins, summary tables,
   per-plugin pages.
+- [Architecture: structured error codes](architecture-errcodes.md) — typed
+  `errcodes` vocabulary shared across plugins.
+- [Architecture: risk labels](architecture-risk-labels.md) — low / medium /
+  high on write tools, surfaced via `mcp.tools_list`.
+- [Architecture: watch / streaming](architecture-watch.md) — long-running
+  observer convention + `watch.list/poll/stop/status` core tools.
+- [Architecture: MCP introspection](architecture-mcp-introspection.md) —
+  `mcp.*` + `doctor.*` for self-introspection and health.
 - [Unreal deep dive](unreal/index.md) — the largest plugin surface, with its
   C++ companion sub-plugin, headless Blueprint authoring, PIE lifecycle, Live
   Coding, crash recovery, and the editor Message Log.
