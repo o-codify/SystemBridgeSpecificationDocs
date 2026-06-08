@@ -2,7 +2,7 @@
 id: plugin-scrape
 title: "Plugin: scrape"
 status: stable
-version: 26.608.1653
+version: 26.608.1923
 tags: [ plugin, scrape, web, chromedp, markdown ]
 ---
 
@@ -54,6 +54,32 @@ scrape.crawl({
   max_pages: 20,
   max_depth: 2
 })
+```
+
+## Fetch pipeline
+
+```mermaid
+flowchart TD
+  call[scrape.html / text / fields / links] --> render{render_js?}
+  render -- false --> static[http.Get + 10MB cap]
+  render -- true --> chrome[chromedp.Navigate + WaitReady]
+  chrome --> chromeOk{success?}
+  chromeOk -- yes --> html[outerHTML]
+  chromeOk -- no --> fallback[static fallback]
+  fallback --> static
+  static --> html
+  html --> sel{selector?}
+  sel -- yes --> filter[goquery Find selector]
+  sel -- no --> whole[whole document]
+  filter --> result[apply tool transform]
+  whole --> result
+  result --> tool{tool type}
+  tool -- html --> rawHtml[return outerHTML]
+  tool -- text markdown --> md[html-to-markdown]
+  tool -- text readability --> read[go-readability]
+  tool -- text plain --> plain[goquery Text]
+  tool -- fields --> json[CSS-selector schema map]
+  tool -- links --> links[a href filter + resolve]
 ```
 
 ## Implementation notes
