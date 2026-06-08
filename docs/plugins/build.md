@@ -2,7 +2,7 @@
 id: plugin-build
 title: "Plugin: build"
 status: stable
-version: 26.608.1654
+version: 26.608.1923
 tags: [ plugin, build, test, lint, deps, go, node, rust, python ]
 ---
 
@@ -31,19 +31,34 @@ runner's text format.
 
 ## Detection priority
 
-By marker file in `root` (cwd by default):
+```mermaid
+flowchart TD
+  start([scan root]) --> goMod{go.mod?}
+  goMod -- yes --> goT[go]
+  goMod -- no --> cargo{Cargo.toml?}
+  cargo -- yes --> rustT[rust]
+  cargo -- no --> pkgJson{package.json?}
+  pkgJson -- yes --> nodeT[node]
+  pkgJson -- no --> py{pyproject.toml /\nsetup.py /\nrequirements.txt?}
+  py -- yes --> pythonT[python]
+  py -- no --> dn{*.csproj /\n*.sln?}
+  dn -- yes --> dotnetT[dotnet TBD]
+  dn -- no --> java{pom.xml /\nbuild.gradle?}
+  java -- yes --> javaT[java TBD]
+  java -- no --> mk{Makefile?}
+  mk -- yes --> makeT[make]
+  mk -- no --> none[no toolchain - pass explicitly]
+  nodeT --> nodeSub{lockfile?}
+  nodeSub -- pnpm-lock.yaml --> pnpmT[node:pnpm]
+  nodeSub -- yarn.lock --> yarnT[node:yarn]
+  nodeSub -- otherwise --> npmT[node:npm]
+  pythonT --> pySub{lockfile?}
+  pySub -- uv.lock --> uvT[python:uv]
+  pySub -- poetry.lock --> poetryT[python:poetry]
+  pySub -- otherwise --> pipT[python:pip]
+```
 
-| Marker | Toolchain |
-|---|---|
-| `go.mod` | go |
-| `Cargo.toml` | rust |
-| `package.json` | node (sub-detected: npm / pnpm / yarn by lockfile) |
-| `pyproject.toml` / `setup.py` / `requirements.txt` | python (sub: pip / uv / poetry) |
-| `*.csproj` / `*.sln` | dotnet (TBD — falls through to make) |
-| `pom.xml` / `build.gradle*` | java (TBD) |
-| `Makefile` | make (fallback) |
-
-Multiple markers → returns primary + lists `others_detected`.
+Multiple markers → returns the primary plus lists `others_detected`.
 
 ## Test-output parsing
 
