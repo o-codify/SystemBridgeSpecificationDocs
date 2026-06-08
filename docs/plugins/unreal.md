@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.608.2205
+version: 26.608.2222
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -307,6 +307,16 @@ Linking pose AND data pins reuses `bp_node_link_pins` / `bp_node_break_link` / `
 | `asset_version_info` | **v1.12.2+** | Saved engine version + custom-version container + warnings for an asset. Diagnoses 'why won't this load' failures (engine-skew, custom-version mismatch). |
 | `asset_metadata` | **v1.12.2+** | Per-object metadata key-value pairs for the asset + its immediate subobjects (`UMetaData::GetMapForObject`). Author-time hints, tooltips, categories. |
 | `bp_function_bytecode` | **v1.12.3+** | Line-by-line Kismet bytecode disassembly for one BP function. v1.12.5 decodes operands (FProperty names, UFunction names, typed constants, casts, jumps, switch cases). Diagnoses 'graph compiles but runtime is wrong' — self-context bugs become 'EX_LocalOutVariable without preceding EX_Self'. |
+
+### Anim state-machine pose + transition rule (v1.13.2)
+
+Completes the v1.13.0 SM authoring — the always-true transitions and
+empty states are no longer the only option.
+
+| Tool | Companion | Purpose |
+|---|---|---|
+| `anim_state_machine_set_state_pose` | **v1.13.2+** | Populate a state's inner anim graph with a SequencePlayer wired to the OutputAnimGraphNode Result pin. Replaces any existing anim node. Idempotent. |
+| `anim_state_machine_set_transition_rule_enum_equals` | **v1.13.2+** | Set a transition's boolean rule to `<variable> == <enum>::<value>` (or `!=` if negate). Rebuilds the transition's BoundGraph from scratch — VarGet → EqualEqual_ByteByte ← ByteLiteral → TransitionResult. |
 
 ### Macros / interfaces / function locals (v1.13.1)
 
