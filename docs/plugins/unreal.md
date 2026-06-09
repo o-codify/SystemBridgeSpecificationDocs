@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.608.2350
+version: 26.609.233
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -276,13 +276,23 @@ Linking pose AND data pins reuses `bp_node_link_pins` / `bp_node_break_link` / `
 | `skeleton_bone_transform` | pure Python | A bone's reference-pose transform in `bone` or `component` space. |
 | `actor_transform_query` | pure Python | Live world transform; optional component / bone / socket / relative_to. |
 
-### BP variable lifecycle (v1.12)
+### BP variable lifecycle (v1.12 + v1.13.4 bug-fix)
+
+Same public tools as v1.12, with v1.13.4 repairing the broken-type
+case: a variable whose `FEdGraphPinType.PinSubCategoryObject` points
+at a deleted `UEnum` / `UScriptStruct` / `UClass` used to leave its
+Blueprint stuck in `BS_Error` even after `bp_variable_remove_direct`,
+because the orphan `K2Node_VariableGet/Set` nodes still referenced
+the now-missing var by name. v1.13.4 sweeps those nodes by name
+across all four graph kinds and reports the actual post-compile
+status. See [companion v1.13.4](../unreal/companion.md#version-timeline)
+for the C++ details.
 
 | Tool | Companion | Purpose |
 |---|---|---|
-| `bp_variable_remove_direct` | **v1.12+** | Surgical remove via `FBlueprintEditorUtils::RemoveMemberVariable`. No collateral sweep — unlike `bp_variable_remove` which goes through `remove_unused_variables` and can take legit unused vars with it. Works on broken-typed vars (deleted-enum etc.). |
+| `bp_variable_remove_direct` | **v1.12+ (fixed v1.13.4)** | Surgical remove via `FBlueprintEditorUtils::RemoveMemberVariable`. No collateral sweep of unrelated vars (unlike `bp_variable_remove`'s `remove_unused_variables` path). v1.13.4 added an orphan-`K2Node_VariableGet/Set`-by-name sweep across Ubergraphs / Function / Macro / Delegate graphs so the BP actually compiles clean afterwards. Returns `nodes_swept` + `blueprint_status` (`up_to_date` / `error` / …). Works on broken-typed vars (deleted-enum etc.) where the orphan nodes would otherwise pin the BP to `BS_Error`. |
 | `bp_variable_rename_atomic` | **v1.12+** | Atomic rename via `FBlueprintEditorUtils::RenameMemberVariable`. Preserves type + metadata; does NOT leave the old var behind (the way `bp_variable_rename` does). |
-| `bp_variable_retype` | **v1.12+** | In-place retype via `FBlueprintEditorUtils::ChangeMemberVariableType`. Same pin_category vocab as `bp_variable_add_typed`. Refs in graphs reconstruct. |
+| `bp_variable_retype` | **v1.12+ (fixed v1.13.4)** | In-place retype via `FBlueprintEditorUtils::ChangeMemberVariableType`. Same `pin_category` vocab as `bp_variable_add_typed`. v1.13.4 added broken-`PinSubCategoryObject` repair: sanitizes `NewVariables[i].VarType` to a Bool placeholder when the existing type needs a subobject but has none, retypes, then reconstructs every `K2Node_Variable` referencing the var so pin sets resolve against the new definition. Returns `blueprint_status` for end-to-end verification. |
 
 ### Runtime invoke + PIE input (v1.12)
 
