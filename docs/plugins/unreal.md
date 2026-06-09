@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.609.229
+version: 26.609.311
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -53,7 +53,8 @@ Tools that need C++ reach (`UEdGraphPin::DefaultObject`, `TObjectIterator`,
 |---|---|
 | [`editor_status`](../unreal/index.md#editor_status) | Is the editor alive, reachable, loaded with cwd's project? Includes `last_crash`, `auto_recover` block. Always call this first in multi-step flows. |
 | `editor_restart` | Save → quit → wait → relaunch. Auto-suppresses [crash watcher](../unreal/crash-recovery.md). Optional `skip_save_all_dirty` quits without persisting (use when the in-memory state is known bad). |
-| `editor_launch` | Cold-start a closed editor: resolve engine binary from EngineAssociation, spawn detached with optional level + extra_args, poll until alive. Idempotent. The cold-start counterpart to `editor_restart`. |
+| `editor_launch` | Cold-start a closed editor: resolve engine binary from EngineAssociation, spawn detached with optional level + extra_args, poll until alive. Idempotent. The cold-start counterpart to `editor_restart`. Clears any crash-watcher suppression left by `editor_quit`. |
+| `editor_quit` | Close the editor and KEEP it closed: suppress the crash-watcher for `ttl_seconds` (default 600), save dirty, `QUIT_EDITOR`, wait, `taskkill` if `force=true`. Unlike `editor_restart`, does NOT relaunch. Use before a build cycle (`scripts/build.sh` rebuild of sb-unreal, or a companion DLL UAT BuildPlugin) that must overwrite locked `UnrealEditor-*.dll` and needs the editor to stay down so the freshly-built DLL is the one loaded next launch. Reopen with `editor_launch`. |
 | `editor_save_all_dirty` | Saves all dirty `/Game` assets. |
 | `editor_load_level` | Open a different level by package path. |
 | `editor_take_screenshot` | HighResShot via the viewport; returns a PNG path. |
