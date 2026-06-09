@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.609.311
+version: 26.609.2124
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -273,6 +273,7 @@ Linking pose AND data pins reuses `bp_node_link_pins` / `bp_node_break_link` / `
 | `mesh_sockets_list` | pure Python | Sockets on SkeletalMesh / StaticMesh (name, parent_bone, relative xform). v1.12 switched to the public `num_sockets()` / `get_socket_by_index()` API — v1.11 hit the protected `Sockets` UPROPERTY and dumped a ~270KB traceback. |
 | `mesh_socket_transform` | pure Python | A SkeletalMesh socket's relative xform + parent bone in component space. |
 | `mesh_socket_add` | **v1.12+** | Create or update a SkeletalMesh socket headlessly — sets `parent_bone`, which stock UE 5.7 Python can't (`VisibleAnywhere + BlueprintReadOnly`). Idempotent on socket name. Optional `add_to_skeleton`. |
+| `skeletal_mesh_set_skeleton` | **v1.13.5+** | Re-bind a SkeletalMesh onto a DIFFERENT Skeleton headless — the editor's *Assign Skeleton*. Maps bones by name; `missing_bone_policy` ∈ `fail` / `merge_into_target` (default — grows the target via `MergeAllBonesToBoneTree`) / `remap_to_parent` (collapses unmatched bones' skin weights onto the nearest surviving ancestor via `IMeshUtilities::RemoveBonesFromMesh`). Bind-pose geometry unchanged. Returns `{matched, merged, remapped, target_modified, unmatched:[{bone, action}], new_skeleton}`. Lets a mesh authored for skeleton A natively play skeleton B's anims (shared-name bones land exactly at B's positions). See [companion v1.13.5](../unreal/companion.md#version-timeline). |
 | `skeleton_bones_list` | pure Python | Bones with parent_index / parent_name. v1.12 walks `SkeletalMeshEditorSubsystem.get_bone_tree` first — returned empty on some 5.7 meshes via the old path. |
 | `skeleton_bone_transform` | pure Python | A bone's reference-pose transform in `bone` or `component` space. |
 | `actor_transform_query` | pure Python | Live world transform; optional component / bone / socket / relative_to. |
