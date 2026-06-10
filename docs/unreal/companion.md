@@ -2,7 +2,7 @@
 id: systembridgecompanion-plugin
 title: SystemBridgeCompanion Plugin
 status: stable
-version: 26.609.2123
+version: 26.610.1705
 tags: [ unreal, companion, cpp ]
 ---
 
@@ -79,6 +79,7 @@ having to call `companion_status`.
 
 | Version | What was added |
 |---|---|
+| **1.13.6** | Explicit `bone_name_map` for N→M chain remap — closes the `skeletal-mesh-set-skeleton-bonemap` spec request. v1.13.5's name-only matching is wrong when a chain has more bones on the source than the target: a Synty Sidekick 5-bone spine onto the ALS 3-bone spine binds `spine_01..03` 1:1 and collapses `spine_04/05` onto mid-back `spine_03`, so the upper torso rides the middle bone rigidly (measured: the upper-chest region lands 23.6 cm past the target's chest top under the target ref pose). New binding `SkeletalMeshSetSkeletonEx(Mesh, Target, policy, BoneNameMapJson)`: listed mesh bones are RENAMED to their target bone's name in the mesh reference skeleton via `FReferenceSkeletonModifier::Rename` (skin weights are index-bound and follow) — two-phase (`src → SB_TMP__i → tgt`) so chained maps survive JSON's nondeterministic iteration order; every Rename is verified via `FindBoneIndex` because it returns void and silently no-ops on name conflicts. A "preempted" bone (unlisted owner of a claimed name) is renamed aside to `SB_DROP__<name>` and collapsed by the normal `remap_to_parent` path — required policy when preemption occurs; removal can't free a name because `RemoveBonesFromMesh` is MeshBoneReduction LOD weight collapse, NOT a ref-skeleton removal. Not doable in pure Python: `USkeletonModifier`'s commit pops a modal merge dialog whenever a rename diverges from the assigned skeleton — always, for a retarget (verified: headless commit returns false). Old `SkeletalMeshSetSkeleton` delegates to the Ex variant. Success JSON adds `renamed` + `preempted`. sb-side: `bone_name_map` object param + pure-Python `duplicate_to` (re-target a fresh copy; refuses to overwrite) + in-place-overwrite WARNING in the description, RiskLevel high. Build.cs +Json. Acceptance on ALS_UltimateWarfare: map `{"spine_05":"spine_03","spine_03":"spine_02"}` puts the Sidekick upper-chest region at z=140.03 — exactly the ALS top spine bone (delta 0.0). |
 | **0.1.0** | Read-only introspection: `CompanionVersion`, `GetBlueprintGraphs`, `GetBlackboardKeys`. |
 | **0.2.0** | K2Node graph editing: enumeration, creation, pin linking. |
 | **0.3.0** | Full pin introspection (types, links, defaults), node removal, link breaking, `K2Node_CallFunction` target setup, `ReconstructNode`. |
