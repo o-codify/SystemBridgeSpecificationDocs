@@ -2,7 +2,7 @@
 id: workflow-c-iteration
 title: "Workflow: C++ Iteration"
 status: stable
-version: 26.601.1847
+version: 26.610.1545
 tags: [ workflow, cpp, live-coding ]
 ---
 
@@ -17,6 +17,11 @@ tools.
 See: [Live Coding reference](../unreal/live-coding.md),
 [PIE workflow](../unreal/pie-workflow.md),
 [workflows index](index.md).
+
+> This workflow is for **permanent** code changes. For a ONE-OFF native
+> editor operation (query/mutate something via UE C++ APIs once, no
+> lasting source edit), use [`run_cpp`](../unreal/run-cpp.md) instead —
+> it owns the splice + compile + invoke cycle in a single tool call.
 
 ## Preconditions
 
