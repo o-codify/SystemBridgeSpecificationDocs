@@ -1,8 +1,8 @@
 ---
 id: extending-systembridge
 title: Extending SystemBridge
-status: review
-version: 26.610.1444
+status: stable
+version: 26.610.1448
 tags: [ architecture, plugins, authoring, contributing ]
 ---
 
