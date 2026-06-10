@@ -2,7 +2,7 @@
 id: changelog
 title: Changelog
 status: stable
-version: 26.610.1544
+version: 26.610.1706
 tags: [ changelog ]
 ---
 
@@ -11,6 +11,12 @@ tags: [ changelog ]
 Milestones for SystemBridge as a whole — daemon (`sb.exe`), plugins,
 and the Unreal Companion sub-plugin. Individual companion versions are
 also captured in [companion plugin reference](unreal/companion.md).
+
+## Recent: companion v1.13.6 — bone_name_map chain remap
+
+| Date | Tag | What |
+|---|---|---|
+| 2026-Q2 | **Companion v1.13.6** | `skeletal_mesh_set_skeleton` gains `bone_name_map` `{source: target}` — explicit N→M chain remap applied before name matching (map the chain endpoints; renames in the mesh ref skeleton via `FReferenceSkeletonModifier::Rename`, weights follow). Fixes the bunched-torso artifact when the source chain is longer than the target's (Sidekick 5-bone spine → ALS 3-bone spine). Plus `duplicate_to` (re-target a fresh copy) and an in-place-overwrite warning, per the request's operational note. See [companion v1.13.6](unreal/companion.md#version-timeline). |
 
 ## Recent: run_cpp — C++ snippets in the live editor
 
