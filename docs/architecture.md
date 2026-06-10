@@ -2,7 +2,7 @@
 id: architecture
 title: Architecture
 status: stable
-version: 26.608.2149
+version: 26.610.1445
 tags: [ architecture, internals ]
 ---
 
@@ -13,7 +13,7 @@ helper** + (for UE) **C++ companion sub-plugin**. Every layer is decoupled
 via documented wire formats so each can ship independently.
 
 See also: [overview](README.md), [installation](installation.md),
-[plugins index](plugins/index.md).
+[plugins index](plugins/index.md), [extending SystemBridge](extending.md).
 
 ## Layers
 
