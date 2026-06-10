@@ -2,7 +2,7 @@
 id: live-coding
 title: Live Coding
 status: stable
-version: 26.601.1817
+version: 26.610.1553
 tags: [ unreal, live-coding, cpp ]
 ---
 
@@ -152,6 +152,8 @@ The cost is one cold start, ~2-5s of extra time.
 
 ## Cross-references
 
+- [run_cpp](run-cpp.md) — one-off C++ snippets in the live editor; uses
+  this compile cycle under the hood.
 - [C++ iteration workflow](../workflows/cpp-iteration.md) — end-to-end
   edit / compile / verify loop.
 - [unreal plugin tool catalog](../plugins/unreal.md#build--test-out-of-process).
