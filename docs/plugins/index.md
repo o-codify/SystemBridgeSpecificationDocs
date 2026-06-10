@@ -2,7 +2,7 @@
 id: plugins-index
 title: Plugins — Index
 status: stable
-version: 26.608.1656
+version: 26.610.1545
 tags: [ plugins, index ]
 ---
 
@@ -32,7 +32,7 @@ process slots + keeps the agent's tool list focused.
 | Plugin | Page | Standout tools |
 |---|---|---|
 | `files` | [files](files.md) | `tree`, `read` (with offset/limit), `read_range`, `outline`, `edit` (find/replace), `recent_changes`, `watch` |
-| `unreal` | [unreal](unreal.md) | `pie_run_and_watch`, `live_coding_compile`, `bp_*` (Blueprint authoring), `editor_message_log`, `editor_status` |
+| `unreal` | [unreal](unreal.md) | `pie_run_and_watch`, `live_coding_compile`, `run_cpp` (C++ snippets in the live editor), `bp_*` (Blueprint authoring), `editor_message_log`, `editor_status` |
 | `git` | [#git](#git) | `status`, `diff`, `log_search`, `recent_commits`, `commit`, `branch_*`, `cherry_pick`, `stash` |
 | `process` | [#process](#process) | `list`, `find`, `kill`, `ports`, `run_command`, `history` |
 | `search` | [#search](#search) | `grep` (ripgrep wrapper), `find_files`, `xref`, `find_symbol`, `replace` |
