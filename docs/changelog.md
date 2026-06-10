@@ -2,7 +2,7 @@
 id: changelog
 title: Changelog
 status: stable
-version: 26.608.1659
+version: 26.610.1544
 tags: [ changelog ]
 ---
 
@@ -11,6 +11,12 @@ tags: [ changelog ]
 Milestones for SystemBridge as a whole — daemon (`sb.exe`), plugins,
 and the Unreal Companion sub-plugin. Individual companion versions are
 also captured in [companion plugin reference](unreal/companion.md).
+
+## Recent: run_cpp — C++ snippets in the live editor
+
+| Date | Tag | What |
+|---|---|---|
+| 2026-Q2 | sb-unreal | `run_cpp` + `run_cpp_status` — the native analogue of `run_python`. Splices a C++ snippet into the fixed `RunScratch()` body of a tool-generated **project-scope** SystemBridgeScratch plugin, recompiles via Live Coding (~4 s), generation-stamp-verifies the patch actually loaded, invokes via Remote Execution. Compile errors come back structured `{file, line, code, message}` by re-running cl.exe on the scratch TU with UBT's own .rsp (UE 5.7.4 LCC keeps diagnostics window-only). Companion untouched — Live Coding can't patch precompiled Rocket plugins, which is exactly why the scratch is project-scope. Risk: destructive. See [run_cpp reference](unreal/run-cpp.md). |
 
 ## Recent: bulk offline asset scanner (no companion / no editor)
 
