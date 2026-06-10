@@ -2,7 +2,7 @@
 id: plugin-unreal
 title: "Plugin: unreal"
 status: stable
-version: 26.609.2124
+version: 26.610.1543
 tags: [ plugin, unreal, ue ]
 ---
 
@@ -73,6 +73,16 @@ Tools that need C++ reach (`UEdGraphPin::DefaultObject`, `TObjectIterator`,
 | Tool | Purpose |
 |---|---|
 | `run_python` | Escape hatch. Sends an arbitrary Python script to the running editor via Remote Execution. Returns parsed `<<<SB_JSON>>>` blocks (see [protocol](#sb_json-marker-protocol)). Prepends `sb_helpers.py` so any helper is callable inline. |
+
+### C++ snippet execution
+
+See the [run_cpp reference](../unreal/run-cpp.md) for the mechanism,
+setup and limits.
+
+| Tool | Purpose |
+|---|---|
+| `run_cpp` | Execute a C++ snippet in the LIVE editor — the native analogue of `run_python`. Splices the snippet into the fixed `RunScratch()` body of the project-scope **SystemBridgeScratch** plugin, recompiles via Live Coding (~4 s per call), invokes it via Remote Execution, returns its FString (JSON by convention, parsed into `result_json`). On compile error: structured `compile_errors` `{file, line, code, message}`, the stale body is NOT invoked. A generation stamp guards against a patch that silently didn't load. **Risk: destructive** — arbitrary native code can crash the editor (crash watcher / `editor_restart` recover). First call on a project installs the scratch plugin source and returns `setup_steps` (one-time `project_build` + editor restart). Requires a C++ project. |
+| `run_cpp_status` | Reader for `run_cpp`: scratch plugin install/load state, `source_generation` vs `loaded_generation`, `in_sync`, `bootstrap` flag. |
 
 ### Asset / Content browser
 
