@@ -2,13 +2,13 @@
 id: set-skeleton-follow-up-explicit-bone-name-map-for-n-m-chain-remap
 title: "set_skeleton follow-up: explicit bone_name_map for N→M chain remap"
 status: request
-version: 26.610.1611
+version: 26.610.1612
 tags: [ unreal, skeletal-mesh, skeleton, skin-weights, request ]
 ---
 
 # set_skeleton follow-up: explicit bone_name_map for N→M chain remap
 
-Follow-up to [unreal_skeletal_mesh_set_skeleton](skeletal-mesh-set-skeleton.md). The shipped tool matches bones by **name only**, which is wrong when a chain has more bones on the source than the target.
+Follow-up to the shipped `unreal_skeletal_mesh_set_skeleton` tool. It matches bones by **name only**, which is wrong when a chain has more bones on the source than the target.
 
 ## Problem
 A Sidekick spine has 5 bones (`spine_01..05`); the ALS spine has 3 (`spine_01..03`). Name matching binds `spine_01/02/03 → spine_01/02/03` and collapses the source's `spine_04/05` onto their parent `spine_03` (`remap_to_parent`). Result: the **upper torso/shoulders bunch at mid-back** instead of distributing up toward the neck. The correct mapping is by **position along the chain (endpoints + middle)**: `spine_01 → spine_01`, `spine_03 → spine_02`, `spine_05 → spine_03`, with the in-between source bones remapped.
