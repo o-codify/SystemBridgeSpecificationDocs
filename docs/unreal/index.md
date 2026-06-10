@@ -2,7 +2,7 @@
 id: unreal-deep-dive
 title: Unreal — Deep Dive
 status: stable
-version: 26.607.1733
+version: 26.610.1544
 tags: [ unreal, ue, index ]
 ---
 
@@ -24,6 +24,8 @@ For the tool catalog (every UE tool with one-line descriptions), see
 - [PIE workflow](pie-workflow.md) — Play-In-Editor lifecycle, watch tools,
   compile-error pre-flight.
 - [Live Coding](live-coding.md) — synchronous incremental C++ compile.
+- [run_cpp](run-cpp.md) — execute one-off C++ snippets in the live editor
+  via a recompiled scratch function (the native `run_python`).
 - [Crash recovery](crash-recovery.md) — persistent watcher, auto-recover
   semantics, suppression layers.
 - [Message Log](message-log.md) — UE's in-memory categorized messages
@@ -52,6 +54,7 @@ For the tool catalog (every UE tool with one-line descriptions), see
 | "Is the editor responsive and on the right project?" | [`editor_status`](#editor_status) |
 | "Did anything break while I was away?" | `editor_status.last_crash` + [crash recovery](crash-recovery.md) |
 | "Compile C++ and iterate." | [live_coding_compile](live-coding.md) |
+| "Run a one-off C++ editor operation, no permanent binding." | [run_cpp](run-cpp.md) |
 | "Edit a Blueprint without clicking." | [blueprint authoring](blueprint-authoring.md) |
 | "Launch PIE and watch it." | [`pie_run_and_watch`](pie-workflow.md) |
 | "Find package-load errors / MapCheck warnings." | [message log](message-log.md) |
